@@ -238,6 +238,52 @@
       color: var(--neon-pink);
     }
 
+    /* Hallucinate Style "PLAY CONCERT" Button (Cannot Stop - Only Play) */
+    .btn-play-pulsing {
+      background: linear-gradient(135deg, rgba(255, 0, 85, 0.55), rgba(0, 240, 255, 0.55)) !important;
+      border: 1px solid var(--neon-cyan) !important;
+      color: #ffffff !important;
+      font-weight: 800 !important;
+      letter-spacing: 1.2px !important;
+      text-transform: uppercase;
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.45), inset 0 0 8px rgba(255, 0, 85, 0.3) !important;
+      animation: pulse-glow-btn 1.8s infinite ease-in-out;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-play-pulsing:hover {
+      background: linear-gradient(135deg, rgba(255, 0, 85, 0.85), rgba(0, 240, 255, 0.85)) !important;
+      box-shadow: 0 0 24px rgba(0, 240, 255, 0.95), inset 0 0 14px rgba(255, 0, 85, 0.6) !important;
+      transform: scale(1.05);
+      border-color: #ffffff !important;
+    }
+
+    .pulse-play-triangle {
+      color: var(--neon-lime);
+      font-size: 14px;
+      animation: pulse-triangle 0.9s infinite alternate;
+      display: inline-block;
+    }
+
+    @keyframes pulse-triangle {
+      0% { transform: scale(1); filter: drop-shadow(0 0 2px var(--neon-lime)); }
+      100% { transform: scale(1.3); filter: drop-shadow(0 0 8px var(--neon-lime)); }
+    }
+
+    @keyframes pulse-glow-btn {
+      0%, 100% {
+        box-shadow: 0 0 14px rgba(0, 240, 255, 0.45), inset 0 0 6px rgba(255, 0, 85, 0.3);
+        border-color: var(--neon-cyan);
+      }
+      50% {
+        box-shadow: 0 0 24px rgba(255, 0, 85, 0.85), inset 0 0 12px rgba(0, 240, 255, 0.6);
+        border-color: var(--neon-pink);
+      }
+    }
+
     /* ---------------- HALLUCINATE INTRO GATE ---------------- */
     #intro-gate {
       position: fixed;
@@ -815,6 +861,12 @@
         </div>
 
         <div class="concert-controls">
+          <!-- Hallucinate Style "PLAY CONCERT" Button (Cannot Stop - Only Play) -->
+          <button id="btn-force-play" class="hud-btn btn-play-pulsing" title="Play Live Concert Stream [CANNOT STOP]">
+            <span class="pulse-play-triangle">▶</span>
+            <span style="font-weight: 800; letter-spacing: 1px;">PLAY CONCERT</span>
+          </button>
+
           <!-- 24/7 Live Broadcast Status Indicator -->
           <div class="hud-badge" style="border-color: rgba(255, 0, 85, 0.5); background: rgba(255, 0, 85, 0.15); display: flex; gap: 8px; align-items: center;" title="24/7 Continuous Live Concert Stream">
             <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--neon-pink); box-shadow: 0 0 8px var(--neon-pink); animation: pulse-beat 0.9s infinite;"></span>
@@ -894,6 +946,11 @@
     <!-- Bottom Hallucinate Action Dock -->
     <footer class="hud-bottombar">
       <div class="hallucinate-dock">
+        <!-- Hallucinate Style "PLAY CONCERT" Action Pill (Cannot Stop - Only Play) -->
+        <div class="dock-pill btn-play-pulsing" id="pill-play-live" data-key="KeyP" title="Play Live Concert Stream [CANNOT STOP]">
+          <span class="pulse-play-triangle">▶</span>
+          <span class="keycap-label" style="font-weight: 800; color: #fff;">play concert</span>
+        </div>
         <div class="dock-pill" id="pill-tab" data-key="Tab" title="Toggle Avatar Drawer [TAB]">
           <span class="keycap-k">TAB</span>
           <span class="keycap-label">alt inputs</span>
@@ -1020,7 +1077,7 @@
         <input type="text" id="intro-handle" placeholder="Your Instagram or X id (optional)" maxlength="25" />
       </div>
       <button class="intro-enter-btn" id="btn-enter-gate">
-        ENTER FESTIVAL & UNMUTE AUDIO ➔
+        ENTER FESTIVAL & PLAY LIVE CONCERT ▶
       </button>
       <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); text-align: center;">
         24/7 Synchronized Live Stream • Up to 100 P2P Crowd • Free Entry
@@ -1130,8 +1187,8 @@
     // 100% Verified, embeddable, full concert trap / rap performances
     const BROADCAST_SCHEDULE = [
       { artist: 'DRAKE', title: 'DRAKE // IT\'S ALL A BLUR TOUR MSG [FULL SHOW]', id: 'rJlNyfxACM4', duration: 4200 },
-      { artist: 'LIL BABY', title: 'LIL BABY // ROLLING LOUD [FULL SET]', id: 'CPcpiBSuGUY', duration: 3300 },
       { artist: 'FUTURE', title: 'FUTURE // LIVE FULL CONCERT', id: 'Qp25s4rqhi4', duration: 3600 },
+      { artist: 'LIL BABY', title: 'LIL BABY // ROLLING LOUD [FULL SET]', id: 'CPcpiBSuGUY', duration: 3300 },
       { artist: 'DRAKE', title: 'DRAKE // WIRELESS FESTIVAL FULL SET', id: 'Hp40WN4Ne7A', duration: 3900 },
       { artist: 'FUTURE', title: 'FUTURE // ROLLING LOUD STADIUM SET', id: 'Ni-nKNR6lSY', duration: 3500 }
     ];
@@ -1159,6 +1216,14 @@
     const initialBroadcast = get247BroadcastNow();
     let currentVideoId = initialBroadcast.item.id;
 
+    function switchVideo(vid) {
+      const item = BROADCAST_SCHEDULE.find(b => b.id === vid);
+      if (item) {
+        loadBroadcastItem(item, 0);
+      }
+    }
+    window.switchVideo = switchVideo;
+
     function loadBroadcastItem(item, seekTime = 0) {
       const label = document.getElementById('live-broadcast-label');
       if (label) label.textContent = item.title;
@@ -1172,18 +1237,20 @@
         }
       }
 
-      if (isYtReady && ytPlayer && ytPlayer.seekTo) {
-        const myTime = ytPlayer.getCurrentTime ? ytPlayer.getCurrentTime() : 0;
-        if (seekTime > 0 && Math.abs(myTime - seekTime) > 4.0) {
-          ytPlayer.seekTo(seekTime, true);
-        }
-        ytPlayer.playVideo();
+      if (isYtReady && ytPlayer && ytPlayer.playVideo) {
+        try {
+          ytPlayer.playVideo();
+        } catch(e) {}
       }
     }
 
     function sync247Stream() {
-      const { item, seekTime } = get247BroadcastNow();
-      loadBroadcastItem(item, seekTime);
+      const { item } = get247BroadcastNow();
+      // Natural progression between headliner sets - NEVER seek mid-stream!
+      if (currentVideoId !== item.id) {
+        console.log(`[STAGE 24/7] Scheduled transition to: ${item.title}`);
+        loadBroadcastItem(item, 0);
+      }
     }
 
     // Failover Guard: If any video triggers an error, auto-advance to next verified concert
@@ -1197,6 +1264,43 @@
     function cycleNextHeadliner() {
       skipToNextBroadcast();
     }
+
+    // "THEY CANNOT STOP - ONLY PLAY" Controller
+    function forcePlayConcert() {
+      console.log('[STAGE] forcePlayConcert - CANNOT STOP POLICY ENFORCED');
+      isAudioUnmuted = true;
+      updateSoundUI();
+
+      // PostMessage commands to iframe
+      sendYouTubeCommand('unMute');
+      sendYouTubeCommand('setVolume', [100]);
+      sendYouTubeCommand('playVideo');
+
+      // Direct YouTube API commands
+      if (isYtReady && ytPlayer) {
+        try {
+          ytPlayer.unMute();
+          ytPlayer.setVolume(100);
+          ytPlayer.playVideo();
+        } catch(e) {}
+
+        try {
+          const state = ytPlayer.getPlayerState ? ytPlayer.getPlayerState() : -1;
+          // 1 = PLAYING, 3 = BUFFERING. If anything else, force play
+          if (state !== 1 && state !== 3) {
+            ytPlayer.playVideo();
+          }
+        } catch(e) {}
+      } else {
+        const iframe = document.getElementById('stage-youtube-iframe');
+        if (iframe && iframe.src.includes('mute=1')) {
+          iframe.src = iframe.src.replace('mute=1', 'mute=0');
+        }
+      }
+
+      showToast('▶ LIVE CONCERT PLAYING // 100% VOLUME // CANNOT STOP');
+    }
+    window.forcePlayConcert = forcePlayConcert;
 
     function buildConcertScreen() {
       const broadcastNow = get247BroadcastNow();
@@ -2824,6 +2928,10 @@
       });
     });
 
+    // Hallucinate Play Concert triggers (Cannot Stop - Only Play)
+    document.getElementById('pill-play-live')?.addEventListener('click', (e) => { e.stopPropagation(); forcePlayConcert(); });
+    document.getElementById('btn-force-play')?.addEventListener('click', (e) => { e.stopPropagation(); forcePlayConcert(); });
+
     document.getElementById('pill-tab')?.addEventListener('click', (e) => { e.stopPropagation(); toggleCustomizer(); });
     document.getElementById('pill-g')?.addEventListener('click', (e) => { e.stopPropagation(); toggleSunglasses(); });
     document.getElementById('pill-t')?.addEventListener('click', (e) => { e.stopPropagation(); cycleCameraMode(); });
@@ -2863,7 +2971,7 @@
         updateNameTag(player.rig.nameTag, nick, handle);
       }
       if (introGate) introGate.classList.add('hidden');
-      ensurePlaybackAndAudio();
+      forcePlayConcert();
       showToast(`🔥 WELCOME TO OCTANE 3D, ${nick.toUpperCase()}! [PRESS H FOR CONTROLS]`);
       broadcastPlayerTransform();
     }
@@ -3008,14 +3116,16 @@
 
         getSync((data) => {
           if (data.vid && data.vid !== currentVideoId) {
-            switchVideo(data.vid, false);
+            switchVideo(data.vid);
           }
           if (isYtReady && ytPlayer && ytPlayer.seekTo && data.time !== undefined) {
             const elapsedSinceHost = (Date.now() - data.epoch) / 1000;
             const targetTime = data.time + elapsedSinceHost;
             const myTime = ytPlayer.getCurrentTime ? ytPlayer.getCurrentTime() : targetTime;
-            if (Math.abs(myTime - targetTime) > 1.8) {
+            // Only resync if massive drift (> 60s) so smooth live streaming is never interrupted
+            if (Math.abs(myTime - targetTime) > 60.0) {
               ytPlayer.seekTo(targetTime, true);
+              ytPlayer.playVideo();
             }
           }
         });
@@ -3167,52 +3277,38 @@
       }
     }
 
-    function setConcertAudio(unmute) {
-      isAudioUnmuted = unmute;
-      if (unmute) {
-        sendYouTubeCommand('unMute');
-        sendYouTubeCommand('setVolume', [100]);
-        sendYouTubeCommand('playVideo');
-        if (ytPlayer && ytPlayer.unMute) {
-          try {
-            ytPlayer.unMute();
-            ytPlayer.setVolume(100);
-            ytPlayer.playVideo();
-          } catch(e) {}
-        }
-        showToast('🔊 STAGE CONCERT AUDIO UNMUTED // 100% VOLUME');
-      } else {
-        sendYouTubeCommand('mute');
-        if (ytPlayer && ytPlayer.mute) {
-          try { ytPlayer.mute(); } catch(e) {}
-        }
-        showToast('🔇 CONCERT AUDIO MUTED');
+    function setConcertAudio(unmute = true) {
+      isAudioUnmuted = true;
+      sendYouTubeCommand('unMute');
+      sendYouTubeCommand('setVolume', [100]);
+      sendYouTubeCommand('playVideo');
+      if (ytPlayer && ytPlayer.unMute) {
+        try {
+          ytPlayer.unMute();
+          ytPlayer.setVolume(100);
+          ytPlayer.playVideo();
+        } catch(e) {}
       }
+      showToast('🔊 STAGE CONCERT AUDIO UNMUTED // 100% VOLUME');
       updateSoundUI();
     }
 
     function ensurePlaybackAndAudio() {
-      if (!isAudioUnmuted) {
-        setConcertAudio(true);
-      } else {
-        sendYouTubeCommand('playVideo');
-        if (ytPlayer && ytPlayer.playVideo) {
-          try { ytPlayer.playVideo(); } catch(e) {}
-        }
-      }
+      forcePlayConcert();
     }
 
-    // Auto-unmute on first user gesture anywhere
+    // Auto-unmute on user gesture anywhere
     window.addEventListener('click', ensurePlaybackAndAudio);
     window.addEventListener('keydown', ensurePlaybackAndAudio);
     window.addEventListener('pointerdown', ensurePlaybackAndAudio);
 
     btnSound?.addEventListener('click', (e) => {
       e.stopPropagation();
-      setConcertAudio(!isAudioUnmuted);
+      forcePlayConcert();
     });
 
-    // Continuous Playback Watchdog: Guarantees 24/7 stream NEVER pauses (checks every 1.2 seconds)
+    // CANNOT STOP POLICY ENFORCEMENT
+    // Continuous Playback Watchdog: Guarantees 24/7 stream NEVER pauses (checks every 1.0 second)
     setInterval(() => {
       if (isYtReady && ytPlayer && ytPlayer.getPlayerState) {
         const state = ytPlayer.getPlayerState();
@@ -3220,7 +3316,7 @@
           ytPlayer.playVideo();
         }
       }
-    }, 1200);
+    }, 1000);
 
     // Periodic 24/7 Global Time-Sync Check (every 8s)
     setInterval(() => {
