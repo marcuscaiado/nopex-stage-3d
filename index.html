@@ -238,55 +238,334 @@
       color: var(--neon-pink);
     }
 
+    /* ---------------- HALLUCINATE INTRO GATE ---------------- */
+    #intro-gate {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: radial-gradient(circle at 50% 40%, rgba(24, 12, 40, 0.94) 0%, rgba(5, 5, 8, 0.98) 100%);
+      backdrop-filter: blur(14px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    #intro-gate.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .intro-glitch-title {
+      font-size: clamp(42px, 7vw, 84px);
+      font-weight: 800;
+      letter-spacing: 4px;
+      color: #fff;
+      text-transform: lowercase;
+      position: relative;
+      text-shadow: -3px 0 var(--neon-cyan), 3px 0 var(--neon-pink);
+      animation: rgb-shift 3s infinite alternate;
+      margin-bottom: 4px;
+      font-family: 'Chakra Petch', sans-serif;
+    }
+
+    @keyframes rgb-shift {
+      0% { text-shadow: -3px 0 #00f0ff, 3px 0 #ff0055; }
+      50% { text-shadow: -4px 2px #ff0055, 4px -2px #00f0ff; }
+      100% { text-shadow: -2px -2px #00f0ff, 3px 2px #ff0055; }
+    }
+
+    .intro-subtitle {
+      font-size: 13px;
+      font-family: var(--font-mono);
+      letter-spacing: 3px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .intro-form-card {
+      background: rgba(12, 14, 22, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 12px;
+      padding: 24px;
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 240, 255, 0.15);
+    }
+
+    .intro-input-wrap {
+      display: flex;
+      align-items: center;
+      background: rgba(5, 7, 12, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 10px 14px;
+      gap: 10px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .intro-input-wrap:focus-within {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+    }
+
+    .intro-input-wrap input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      width: 100%;
+    }
+
+    .intro-enter-btn {
+      background: linear-gradient(135deg, #00f0ff 0%, #ff0055 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 14px;
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 0 24px rgba(0, 240, 255, 0.4);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .intro-enter-btn:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 32px rgba(255, 0, 85, 0.6);
+    }
+
+    /* ---------------- HALLUCINATE KEYCAP HUD ---------------- */
+    .hallucinate-cluster {
+      position: absolute;
+      top: 76px;
+      left: 20px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      pointer-events: auto;
+      z-index: 10;
+    }
+
+    .keycap-box {
+      background: rgba(10, 12, 18, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
+      padding: 5px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+      transition: all 0.15s;
+      min-width: 82px;
+      user-select: none;
+    }
+
+    .keycap-box:hover {
+      border-color: var(--neon-cyan);
+      background: rgba(0, 240, 255, 0.12);
+    }
+
+    .keycap-keys {
+      display: flex;
+      gap: 4px;
+    }
+
+    .keycap-k {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 3px;
+      padding: 1px 5px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 800;
+      color: #fff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    .keycap-label {
+      font-size: 9px;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+      text-transform: lowercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
     /* Bottom Section */
     .hud-bottombar {
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
       pointer-events: auto;
+      width: 100%;
+      gap: 16px;
     }
 
-    /* Emotes & Quick Actions */
-    .hud-emotes {
+    /* Bottom Action Dock */
+    .hallucinate-dock {
       display: flex;
-      gap: 8px;
-      background: var(--panel-bg);
-      border: 1px solid var(--panel-border);
-      padding: 8px;
-      border-radius: 6px;
-      backdrop-filter: blur(10px);
+      gap: 6px;
+      background: rgba(9, 11, 16, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 6px 10px;
+      backdrop-filter: blur(12px);
+      align-items: center;
+      pointer-events: auto;
+      flex-wrap: wrap;
     }
 
-    .emote-btn {
-      background: rgba(255, 255, 255, 0.05);
+    .dock-pill {
+      background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #fff;
-      padding: 8px 12px;
-      border-radius: 4px;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
+      border-radius: 5px;
+      padding: 4px 8px;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 2px;
-      min-width: 78px;
-      transition: all 0.2s;
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
     }
 
-    .emote-btn kbd {
-      font-size: 10px;
-      color: var(--neon-cyan);
+    .dock-pill:hover, .dock-pill.active {
+      border-color: var(--neon-cyan);
       background: rgba(0, 240, 255, 0.15);
-      padding: 1px 4px;
-      border-radius: 2px;
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
     }
 
-    .emote-btn:hover, .emote-btn.active {
-      background: rgba(255, 0, 85, 0.2);
+    .dock-pill.active {
       border-color: var(--neon-pink);
-      box-shadow: 0 0 10px rgba(255, 0, 85, 0.4);
+      color: var(--neon-pink);
+    }
+
+    /* Movement Arrow Cluster (Bottom Right) */
+    .movement-cluster {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      pointer-events: auto;
+    }
+
+    .movement-row {
+      display: flex;
+      gap: 4px;
+    }
+
+    /* Chat Floating Input Overlay */
+    #chat-overlay {
+      position: absolute;
+      bottom: 96px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 520px;
+      background: rgba(9, 10, 16, 0.95);
+      border: 1px solid var(--neon-cyan);
+      box-shadow: 0 0 24px rgba(0, 240, 255, 0.35);
+      border-radius: 8px;
+      padding: 8px 14px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      z-index: 50;
+      pointer-events: auto;
+    }
+
+    #chat-overlay.visible {
+      display: flex;
+    }
+
+    #chat-overlay input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      width: 100%;
+    }
+
+    /* Camera Flash Shutter Overlay */
+    #camera-flash {
+      position: fixed;
+      inset: 0;
+      background: #ffffff;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 99;
+      transition: opacity 0.4s ease-out;
+    }
+
+    #camera-flash.flash {
+      opacity: 0.95;
+      transition: none;
+    }
+
+    /* Help Modal */
+    #help-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 5, 8, 0.85);
+      backdrop-filter: blur(16px);
+      z-index: 90;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    #help-modal.visible {
+      display: flex;
+    }
+
+    .help-card {
+      background: rgba(12, 15, 24, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 40px rgba(0, 240, 255, 0.2);
+      border-radius: 12px;
+      padding: 24px;
+      max-width: 640px;
+      width: 100%;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .help-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .help-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
     }
 
     /* Customization Modal Drawer */
@@ -580,40 +859,174 @@
       </div>
     </div>
 
-    <!-- Bottom Action Bar -->
+    <!-- Top-Left Avatar Keyboard Modifiers Cluster (Hallucinate style) -->
+    <div class="hallucinate-cluster" id="hallucinate-keys">
+      <div class="keycap-box" data-action="hair-color" title="Cycle Hair Color [7 / 8]">
+        <div class="keycap-keys"><span class="keycap-k">7</span><span class="keycap-k">8</span></div>
+        <span class="keycap-label">hair color</span>
+      </div>
+      <div class="keycap-box" data-action="skin-tone" title="Cycle Skin Tone [9 / 0]">
+        <div class="keycap-keys"><span class="keycap-k">9</span><span class="keycap-k">0</span></div>
+        <span class="keycap-label">skin tone</span>
+      </div>
+      <div class="keycap-box" data-action="hair-style" title="Cycle Hair / Cap Style [U / I]">
+        <div class="keycap-keys"><span class="keycap-k">U</span><span class="keycap-k">I</span></div>
+        <span class="keycap-label">hair style</span>
+      </div>
+      <div class="keycap-box" data-action="accessories" title="Toggle Accessories [O / P]">
+        <div class="keycap-keys"><span class="keycap-k">O</span><span class="keycap-k">P</span></div>
+        <span class="keycap-label">accessories</span>
+      </div>
+      <div class="keycap-box" data-action="top-wear" title="Cycle Top Wear Color [J / K]">
+        <div class="keycap-keys"><span class="keycap-k">J</span><span class="keycap-k">K</span></div>
+        <span class="keycap-label">top wear</span>
+      </div>
+      <div class="keycap-box" data-action="dance-moves" title="Cycle Dance Move [L / ;]">
+        <div class="keycap-keys"><span class="keycap-k">L</span><span class="keycap-k">;</span></div>
+        <span class="keycap-label">dance moves</span>
+      </div>
+      <div class="keycap-box" data-action="bottom-wear" title="Cycle Bottom Wear Color [M / ,]">
+        <div class="keycap-keys"><span class="keycap-k">M</span><span class="keycap-k">,</span></div>
+        <span class="keycap-label">bottom wear</span>
+      </div>
+    </div>
+
+    <!-- Bottom Hallucinate Action Dock -->
     <footer class="hud-bottombar">
-      <div class="hud-emotes">
-        <button class="emote-btn" id="btn-customizer" title="Customize Avatar Palette & Gear">
-          <span>⚙️</span>
-          <span>AVATAR</span>
-          <kbd>C</kbd>
-        </button>
-        <button class="emote-btn active" data-emote="0" id="emote-idle">
-          <span>🕺</span>
-          <span>IDLE</span>
-          <kbd>1</kbd>
-        </button>
-        <button class="emote-btn" data-emote="2" id="emote-bounce">
-          <span>🔥</span>
-          <span>BOUNCE</span>
-          <kbd>2</kbd>
-        </button>
-        <button class="emote-btn" data-emote="3" id="emote-trap">
-          <span>🙌</span>
-          <span>TRAP ARMS</span>
-          <kbd>3</kbd>
-        </button>
-        <button class="emote-btn" data-emote="5" id="emote-headnod">
-          <span>🎧</span>
-          <span>HEAD NOD</span>
-          <kbd>4</kbd>
-        </button>
+      <div class="hallucinate-dock">
+        <div class="dock-pill" id="pill-tab" data-key="Tab" title="Toggle Avatar Drawer [TAB]">
+          <span class="keycap-k">TAB</span>
+          <span class="keycap-label">alt inputs</span>
+        </div>
+        <div class="dock-pill" id="pill-g" data-key="KeyG" title="Toggle Cyber Visor / Sunglasses [G]">
+          <span class="keycap-k">G</span>
+          <span class="keycap-label">sunglasses</span>
+        </div>
+        <div class="dock-pill" id="pill-t" data-key="KeyT" title="Cycle Camera Views [T]">
+          <span class="keycap-k">T</span>
+          <span class="keycap-label">view</span>
+        </div>
+        <div class="dock-pill" id="pill-f" data-key="KeyF" title="Take Photo Snapshot & Pin to Wall [F]">
+          <span class="keycap-k">F</span>
+          <span class="keycap-label">camera</span>
+        </div>
+        <div class="dock-pill" id="pill-y" data-key="KeyY" title="Breakdance Power Move [Y]">
+          <span class="keycap-k">Y</span>
+          <span class="keycap-label">breakdance</span>
+        </div>
+        <div class="dock-pill active" id="pill-space" data-key="Space" title="Speak / In-Game Chat [SPACE]">
+          <span class="keycap-k" style="padding: 1px 12px;">SPACE</span>
+          <span class="keycap-label">speak</span>
+        </div>
+        <div class="dock-pill" id="pill-c" data-key="KeyC" title="Spawn Floating Party Bubbles [C]">
+          <span class="keycap-k">C</span>
+          <span class="keycap-label">bubbles</span>
+        </div>
+        <div class="dock-pill" id="pill-v" data-key="KeyV" title="Wave Hands Emote [V]">
+          <span class="keycap-k">V</span>
+          <span class="keycap-label">wave</span>
+        </div>
+        <div class="dock-pill" id="pill-b" data-key="KeyB" title="Bounce / Jetpack Rocket Jump [B]">
+          <span class="keycap-k">B</span>
+          <span class="keycap-label">bounce / jetpack</span>
+        </div>
+        <div class="dock-pill" id="pill-n" data-key="KeyN" title="Rave Smoke / Foam Cannon [N]">
+          <span class="keycap-k">N</span>
+          <span class="keycap-label">foam</span>
+        </div>
+        <div class="dock-pill" id="pill-h" data-key="KeyH" title="Help & Controls Guide [H / ?]">
+          <div style="display: flex; gap: 2px;"><span class="keycap-k">?</span><span class="keycap-k">H</span></div>
+          <span class="keycap-label">help</span>
+        </div>
       </div>
 
-      <div class="hud-badge" style="pointer-events: auto;">
-        <span style="color: var(--text-dim);">CLICK CANVAS TO LOCK CAMERA // [W,A,S,D] MOVE // [SHIFT] SPRINT // [SPACE] JUMP</span>
+      <!-- Movement Arrow Cluster (Bottom Right) -->
+      <div class="movement-cluster">
+        <div class="movement-row">
+          <div class="dock-pill" id="pill-w" data-key="KeyW" style="padding: 3px 10px;">
+            <div style="display: flex; gap: 2px;"><span class="keycap-k">↑</span><span class="keycap-k">W</span></div>
+            <span class="keycap-label">forward</span>
+          </div>
+        </div>
+        <div class="movement-row">
+          <div class="dock-pill" id="pill-a" data-key="KeyA" style="padding: 3px 8px;">
+            <div style="display: flex; gap: 2px;"><span class="keycap-k">←</span><span class="keycap-k">A</span></div>
+            <span class="keycap-label">left</span>
+          </div>
+          <div class="dock-pill" id="pill-s" data-key="KeyS" style="padding: 3px 8px;">
+            <div style="display: flex; gap: 2px;"><span class="keycap-k">↓</span><span class="keycap-k">S</span></div>
+            <span class="keycap-label">back</span>
+          </div>
+          <div class="dock-pill" id="pill-d" data-key="KeyD" style="padding: 3px 8px;">
+            <div style="display: flex; gap: 2px;"><span class="keycap-k">→</span><span class="keycap-k">D</span></div>
+            <span class="keycap-label">right</span>
+          </div>
+        </div>
       </div>
     </footer>
+  </div>
+
+  <!-- Chat Input Overlay (Triggered by SPACE) -->
+  <div id="chat-overlay">
+    <span style="font-family: var(--font-mono); font-size: 13px; color: var(--neon-cyan); font-weight: 800;">💬 SPEAK:</span>
+    <input type="text" id="chat-input" placeholder="Type message to the crowd... [ENTER to send, ESC to cancel]" maxlength="80" autocomplete="off" />
+  </div>
+
+  <!-- Camera Shutter Flash Overlay (Triggered by F) -->
+  <div id="camera-flash"></div>
+
+  <!-- Help & Keybindings Modal (Triggered by H / ?) -->
+  <div id="help-modal">
+    <div class="help-card">
+      <div class="panel-header">
+        <span>HALLUCINATE // FESTIVAL CONTROLS & SHORTCUTS</span>
+        <button id="close-help" class="hud-btn" style="padding: 2px 8px;">✕</button>
+      </div>
+      <div class="help-grid">
+        <div class="help-item"><span>W, A, S, D / Arrows</span><span style="color: var(--neon-cyan);">Move Avatar</span></div>
+        <div class="help-item"><span>SHIFT</span><span style="color: var(--neon-cyan);">Sprint</span></div>
+        <div class="help-item"><span>SPACE</span><span style="color: var(--neon-cyan);">Speak / Chat Bubble</span></div>
+        <div class="help-item"><span>B</span><span style="color: var(--neon-lime);">Bounce / Jetpack Boost</span></div>
+        <div class="help-item"><span>C</span><span style="color: var(--neon-cyan);">Emit Bubbles</span></div>
+        <div class="help-item"><span>N</span><span style="color: var(--neon-pink);">Foam / Smoke Cannon</span></div>
+        <div class="help-item"><span>Y</span><span style="color: var(--neon-amber);">Breakdance Power Move</span></div>
+        <div class="help-item"><span>V</span><span style="color: var(--neon-cyan);">Wave Hands Emote</span></div>
+        <div class="help-item"><span>G</span><span style="color: var(--neon-pink);">Toggle Sunglasses/Visor</span></div>
+        <div class="help-item"><span>T</span><span style="color: var(--neon-cyan);">Switch Camera View</span></div>
+        <div class="help-item"><span>F</span><span style="color: var(--neon-amber);">Photo Snapshot -> Wall</span></div>
+        <div class="help-item"><span>7 / 8</span><span style="color: #fff;">Cycle Hair Color</span></div>
+        <div class="help-item"><span>9 / 0</span><span style="color: #fff;">Cycle Skin Tone</span></div>
+        <div class="help-item"><span>J / K</span><span style="color: #fff;">Cycle Top Wear Color</span></div>
+        <div class="help-item"><span>M / ,</span><span style="color: #fff;">Cycle Pants Color</span></div>
+        <div class="help-item"><span>L / ;</span><span style="color: #fff;">Cycle Dance Moves</span></div>
+      </div>
+      <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); text-align: center; margin-top: 8px;">
+        Click screen or button to toggle concert audio • 24/7 Drake, Future & Lil Baby sets on stage
+      </div>
+    </div>
+  </div>
+
+  <!-- Hallucinate Intro Gate Screen -->
+  <div id="intro-gate">
+    <h1 class="intro-glitch-title">octane // rave</h1>
+    <div class="intro-subtitle">Massively Multiplayer Open-Air Hip-Hop Festival</div>
+    <div class="intro-form-card">
+      <div class="intro-input-wrap">
+        <span style="font-size: 16px;">👤</span>
+        <input type="text" id="intro-nickname" placeholder="Your nickname (required)" value="Raver_01" maxlength="20" />
+      </div>
+      <div class="intro-input-wrap">
+        <span style="font-size: 16px;">📸</span>
+        <input type="text" id="intro-handle" placeholder="Your Instagram or X id (optional)" maxlength="25" />
+      </div>
+      <button class="intro-enter-btn" id="btn-enter-gate">
+        ENTER FESTIVAL & UNMUTE AUDIO ➔
+      </button>
+      <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); text-align: center;">
+        24/7 Synchronized Live Stream • Up to 100 P2P Crowd • Free Entry
+      </div>
+    </div>
+  </div>
   </div>
 
   <div id="toast-msg">CLICK SCREEN TO ENGAGE ORBIT // SOUND & CONCERT ACTIVE</div>
@@ -1137,6 +1550,10 @@
 
         scene.add(towerGroup);
       });
+
+      // In-World 3D Interactive Features (Hallucinate MMORPG Stage features)
+      buildScheduleWall();
+      buildPhotoWall();
     }
 
     // Moving Head Concert Spotlights with Volumetric Cones
@@ -1197,11 +1614,402 @@
     }
 
     /* =========================================================================
+       4B. IN-WORLD 3D SCHEDULE WALL & PHOTO WALL (Hallucinate Features)
+       ========================================================================= */
+    let scheduleCanvasTex = null;
+    let scheduleCanvasCtx = null;
+
+    function buildScheduleWall() {
+      const group = new THREE.Group();
+      group.position.set(-42, 0, -6);
+      group.rotation.y = 0.42;
+
+      // Steel structure backing
+      const frameGeo = new THREE.BoxGeometry(16, 11, 0.6);
+      const frameMat = new THREE.MeshStandardMaterial({ color: 0x11131a, metalness: 0.8, roughness: 0.3 });
+      const frame = new THREE.Mesh(frameGeo, frameMat);
+      frame.position.y = 9;
+      group.add(frame);
+
+      // Support pillars
+      const pillarGeo = new THREE.CylinderGeometry(0.3, 0.3, 10, 8);
+      const p1 = new THREE.Mesh(pillarGeo, frameMat);
+      p1.position.set(-7, 4.5, 0);
+      const p2 = p1.clone();
+      p2.position.x = 7;
+      group.add(p1, p2);
+
+      // Billboard Canvas Display Screen
+      const screenGeo = new THREE.PlaneGeometry(15.2, 10.2);
+      const cvs = document.createElement('canvas');
+      cvs.width = 1024;
+      cvs.height = 768;
+      scheduleCanvasCtx = cvs.getContext('2d');
+      scheduleCanvasTex = new THREE.CanvasTexture(cvs);
+      const screenMat = new THREE.MeshBasicMaterial({ map: scheduleCanvasTex });
+      const screenMesh = new THREE.Mesh(screenGeo, screenMat);
+      screenMesh.position.set(0, 9, 0.32);
+      group.add(screenMesh);
+
+      scene.add(group);
+      updateScheduleWallTexture();
+    }
+
+    function updateScheduleWallTexture() {
+      if (!scheduleCanvasCtx || !scheduleCanvasTex) return;
+      const ctx = scheduleCanvasCtx;
+      const nowInfo = get247BroadcastNow();
+
+      ctx.fillStyle = '#07080d';
+      ctx.fillRect(0, 0, 1024, 768);
+
+      ctx.fillStyle = '#ff0055';
+      ctx.fillRect(0, 0, 1024, 8);
+
+      ctx.font = 'bold 36px "Chakra Petch", monospace';
+      ctx.fillStyle = '#00f0ff';
+      ctx.fillText('OCTANE FESTIVAL // 24/7 GLOBAL TIMETABLE', 48, 68);
+
+      ctx.font = '16px monospace';
+      ctx.fillStyle = '#8e96aa';
+      ctx.fillText('DRAKE • FUTURE • LIL BABY // CONTINUOUS NON-STOP STREAM', 48, 100);
+
+      BROADCAST_SCHEDULE.forEach((item, idx) => {
+        const y = 135 + idx * 116;
+        const isLive = (item.id === nowInfo.item.id);
+
+        ctx.fillStyle = isLive ? 'rgba(255, 0, 85, 0.22)' : 'rgba(255, 255, 255, 0.04)';
+        ctx.strokeStyle = isLive ? '#ff0055' : 'rgba(255, 255, 255, 0.12)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.roundRect(48, y, 928, 96, 12);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = 'bold 26px sans-serif';
+        ctx.fillStyle = isLive ? '#ffffff' : '#b0b8cb';
+        ctx.fillText(item.title, 76, y + 44);
+
+        ctx.font = '16px monospace';
+        ctx.fillStyle = isLive ? '#00f0ff' : '#6b7280';
+        ctx.fillText(`DURATION: ${Math.floor(item.duration / 60)} MIN // SYNCHRONIZED ACROSS ALL 100 PEERS`, 76, y + 76);
+
+        if (isLive) {
+          ctx.fillStyle = '#39ff14';
+          ctx.font = 'bold 22px monospace';
+          ctx.fillText('● LIVE ON STAGE NOW', 660, y + 54);
+        }
+      });
+
+      scheduleCanvasTex.needsUpdate = true;
+    }
+
+    // 3D Photo Wall System
+    let photoWallGroup = null;
+    const photoSlots = [];
+    let nextPhotoSlotIdx = 0;
+
+    function buildPhotoWall() {
+      photoWallGroup = new THREE.Group();
+      photoWallGroup.position.set(42, 0, -6);
+      photoWallGroup.rotation.y = -0.42;
+
+      // Board Frame
+      const boardGeo = new THREE.BoxGeometry(18, 12, 0.6);
+      const boardMat = new THREE.MeshStandardMaterial({ color: 0x14121a, metalness: 0.7, roughness: 0.4 });
+      const board = new THREE.Mesh(boardGeo, boardMat);
+      board.position.y = 9;
+      photoWallGroup.add(board);
+
+      // Support pillars
+      const pillarGeo = new THREE.CylinderGeometry(0.3, 0.3, 10, 8);
+      const p1 = new THREE.Mesh(pillarGeo, boardMat);
+      p1.position.set(-8, 4.5, 0);
+      const p2 = p1.clone();
+      p2.position.x = 8;
+      photoWallGroup.add(p1, p2);
+
+      // Title Banner Header
+      const headerGeo = new THREE.PlaneGeometry(16.5, 1.8);
+      const cvs = document.createElement('canvas');
+      cvs.width = 1024;
+      cvs.height = 128;
+      const ctx = cvs.getContext('2d');
+      ctx.fillStyle = '#0a0a10';
+      ctx.fillRect(0, 0, 1024, 128);
+      ctx.strokeStyle = '#00f0ff';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(4, 4, 1016, 120);
+      ctx.font = 'bold 40px "Chakra Petch", monospace';
+      ctx.fillStyle = '#00f0ff';
+      ctx.fillText('HALLUCINATE // FESTIVAL PHOTO WALL', 40, 75);
+      ctx.font = '20px monospace';
+      ctx.fillStyle = '#ff0055';
+      ctx.fillText('[PRESS F TO SNAP PHOTO]', 700, 75);
+      const headerTex = new THREE.CanvasTexture(cvs);
+      const headerMesh = new THREE.Mesh(headerGeo, new THREE.MeshBasicMaterial({ map: headerTex }));
+      headerMesh.position.set(0, 13.5, 0.32);
+      photoWallGroup.add(headerMesh);
+
+      // 8 Polaroid Slots (2 rows of 4)
+      for (let r = 0; r < 2; r++) {
+        for (let c = 0; c < 4; c++) {
+          const slotX = (c - 1.5) * 4.0;
+          const slotY = 10.6 - r * 3.8;
+          
+          const polaroidGeo = new THREE.BoxGeometry(3.2, 3.4, 0.1);
+          const polaroidMat = new THREE.MeshStandardMaterial({ color: 0xeeece8, roughness: 0.9 });
+          const polaroidMesh = new THREE.Mesh(polaroidGeo, polaroidMat);
+          polaroidMesh.position.set(slotX, slotY, 0.35);
+          polaroidMesh.rotation.z = (Math.random() - 0.5) * 0.12;
+
+          const photoGeo = new THREE.PlaneGeometry(2.8, 2.4);
+          const defaultPhotoMat = new THREE.MeshBasicMaterial({ color: 0x1a1c26 });
+          const photoInner = new THREE.Mesh(photoGeo, defaultPhotoMat);
+          photoInner.position.set(0, 0.25, 0.06);
+          polaroidMesh.add(photoInner);
+
+          photoWallGroup.add(polaroidMesh);
+          photoSlots.push({ polaroidMesh, photoInner });
+        }
+      }
+
+      scene.add(photoWallGroup);
+    }
+
+    function pinPhotoToWall(imageTexture) {
+      if (photoSlots.length === 0) return;
+      const slot = photoSlots[nextPhotoSlotIdx];
+      slot.photoInner.material = new THREE.MeshBasicMaterial({ map: imageTexture });
+      slot.polaroidMesh.scale.set(1.25, 1.25, 1.25);
+      setTimeout(() => { slot.polaroidMesh.scale.set(1, 1, 1); }, 300);
+      nextPhotoSlotIdx = (nextPhotoSlotIdx + 1) % photoSlots.length;
+    }
+
+    function playCameraShutterSound() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(900, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.12);
+      } catch(e) {}
+    }
+
+    function takePhotoSnapshot() {
+      const flashEl = document.getElementById('camera-flash');
+      if (flashEl) {
+        flashEl.classList.add('flash');
+        setTimeout(() => flashEl.classList.remove('flash'), 250);
+      }
+      playCameraShutterSound();
+
+      webglRenderer.render(scene, camera);
+      const dataUrl = webglRenderer.domElement.toDataURL('image/jpeg', 0.85);
+      const img = new Image();
+      img.onload = () => {
+        const tex = new THREE.CanvasTexture(img);
+        pinPhotoToWall(tex);
+        showToast('📸 PHOTO CAPTURED & PINNED TO FESTIVAL WALL!');
+      };
+      img.src = dataUrl;
+    }
+
+    /* =========================================================================
+       4C. PARTICLE SYSTEMS (Bubbles, Foam Cannon, Jetpack Sparks)
+       ========================================================================= */
+    const activeBubbles = [];
+    const bubbleGeo = new THREE.SphereGeometry(0.35, 16, 16);
+    const bubbleMat = new THREE.MeshPhysicalMaterial({
+      color: 0x88e0ff,
+      transmission: 0.9,
+      opacity: 0.75,
+      transparent: true,
+      roughness: 0.1,
+      ior: 1.33,
+      metalness: 0.1
+    });
+
+    function spawnBubbles(originX, originY, originZ, count = 18) {
+      for (let i = 0; i < count; i++) {
+        const mesh = new THREE.Mesh(bubbleGeo, bubbleMat.clone());
+        const s = 0.4 + Math.random() * 0.9;
+        mesh.scale.set(s, s, s);
+        mesh.position.set(
+          originX + (Math.random() - 0.5) * 2.0,
+          originY + 1.2 + Math.random() * 0.8,
+          originZ + (Math.random() - 0.5) * 2.0
+        );
+        scene.add(mesh);
+        activeBubbles.push({
+          mesh,
+          vx: (Math.random() - 0.5) * 0.8,
+          vy: 1.4 + Math.random() * 1.6,
+          vz: (Math.random() - 0.5) * 0.8,
+          phase: Math.random() * Math.PI * 2,
+          age: 0,
+          maxAge: 4.5 + Math.random() * 2.5
+        });
+      }
+    }
+
+    function updateBubbles(delta, elapsed) {
+      for (let i = activeBubbles.length - 1; i >= 0; i--) {
+        const b = activeBubbles[i];
+        b.age += delta;
+        if (b.age >= b.maxAge) {
+          scene.remove(b.mesh);
+          activeBubbles.splice(i, 1);
+          continue;
+        }
+        b.mesh.position.y += b.vy * delta;
+        b.mesh.position.x += (b.vx + Math.sin(elapsed * 4 + b.phase) * 0.4) * delta;
+        b.mesh.position.z += (b.vz + Math.cos(elapsed * 4 + b.phase) * 0.4) * delta;
+        if (b.age > b.maxAge - 1.0) {
+          b.mesh.material.opacity = (b.maxAge - b.age) * 0.75;
+        }
+      }
+    }
+
+    // Rave CO2 Foam Cannon System
+    const activeFoam = [];
+    const foamGeo = new THREE.SphereGeometry(0.5, 12, 12);
+    const foamMat = new THREE.MeshStandardMaterial({
+      color: 0xf0f5ff,
+      transparent: true,
+      opacity: 0.8,
+      roughness: 0.9,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+
+    function spawnFoam(originX, originY, originZ, dirAngle, count = 25) {
+      for (let i = 0; i < count; i++) {
+        const mesh = new THREE.Mesh(foamGeo, foamMat.clone());
+        mesh.position.set(
+          originX + (Math.random() - 0.5) * 1.2,
+          originY + 1.2 + (Math.random() - 0.5) * 0.8,
+          originZ + (Math.random() - 0.5) * 1.2
+        );
+        const speed = 12.0 + Math.random() * 14.0;
+        const spread = (Math.random() - 0.5) * 0.5;
+        const vx = Math.sin(dirAngle + spread) * speed;
+        const vz = Math.cos(dirAngle + spread) * speed;
+        const vy = 1.0 + Math.random() * 3.5;
+        scene.add(mesh);
+        activeFoam.push({
+          mesh,
+          vx,
+          vy,
+          vz,
+          age: 0,
+          maxAge: 2.2 + Math.random() * 1.0
+        });
+      }
+    }
+
+    function updateFoam(delta) {
+      for (let i = activeFoam.length - 1; i >= 0; i--) {
+        const f = activeFoam[i];
+        f.age += delta;
+        if (f.age >= f.maxAge) {
+          scene.remove(f.mesh);
+          activeFoam.splice(i, 1);
+          continue;
+        }
+        f.mesh.position.x += f.vx * delta;
+        f.mesh.position.y += f.vy * delta;
+        f.mesh.position.z += f.vz * delta;
+        f.vx *= 0.94;
+        f.vz *= 0.94;
+        f.vy -= 1.5 * delta;
+        const currentScale = 1.0 + f.age * 3.2;
+        f.mesh.scale.set(currentScale, currentScale, currentScale);
+        f.mesh.material.opacity = Math.max(0, (1 - (f.age / f.maxAge)) * 0.85);
+      }
+    }
+
+    // Jetpack Spark Particles
+    const activeSparks = [];
+    const sparkGeo = new THREE.BoxGeometry(0.14, 0.14, 0.14);
+    const sparkMat = new THREE.MeshBasicMaterial({ color: 0xffaa00 });
+
+    function spawnJetpackSparks(x, y, z) {
+      for (let i = 0; i < 18; i++) {
+        const mesh = new THREE.Mesh(sparkGeo, sparkMat);
+        mesh.position.set(x + (Math.random() - 0.5) * 0.6, y + 0.2, z + (Math.random() - 0.5) * 0.6);
+        scene.add(mesh);
+        activeSparks.push({
+          mesh,
+          vx: (Math.random() - 0.5) * 4.0,
+          vy: -4.0 - Math.random() * 5.0,
+          vz: (Math.random() - 0.5) * 4.0,
+          age: 0,
+          maxAge: 0.6 + Math.random() * 0.4
+        });
+      }
+    }
+
+    function updateSparks(delta) {
+      for (let i = activeSparks.length - 1; i >= 0; i--) {
+        const s = activeSparks[i];
+        s.age += delta;
+        if (s.age >= s.maxAge) {
+          scene.remove(s.mesh);
+          activeSparks.splice(i, 1);
+          continue;
+        }
+        s.mesh.position.x += s.vx * delta;
+        s.mesh.position.y += s.vy * delta;
+        s.mesh.position.z += s.vz * delta;
+      }
+    }
+
+    /* =========================================================================
        5. ANONYMOUS PROCEDURAL AVATAR RIG & ANIMATION ENGINE
        ========================================================================= */
+    const HAIR_COLORS = [
+      { name: 'Neon Cyan', hex: 0x00f0ff },
+      { name: 'Hot Pink', hex: 0xff0055 },
+      { name: 'Acid Lime', hex: 0x39ff14 },
+      { name: 'Platinum Blonde', hex: 0xfff2b2 },
+      { name: 'Electric Violet', hex: 0x9d00ff },
+      { name: 'Midnight Jet', hex: 0x0a0a0e },
+      { name: 'Blaze Orange', hex: 0xff5500 },
+      { name: 'Chrome Silver', hex: 0xe0e6ed }
+    ];
+
+    const SKIN_TONES = [
+      { name: 'Deep Bronze', hex: 0x2e1c14 },
+      { name: 'Warm Mocha', hex: 0x4a2e20 },
+      { name: 'Golden Tan', hex: 0x8a5b3e },
+      { name: 'Warm Almond', hex: 0xb5835c },
+      { name: 'Fair Peach', hex: 0xd8ab8d },
+      { name: 'Obsidian Noir', hex: 0x14151a }
+    ];
+
+    const PANTS_PALETTES = [
+      { name: 'Dark Indigo Denim', hex: 0x161d2d },
+      { name: 'Matte Black Cargo', hex: 0x0e0e11 },
+      { name: 'Desert Sand Khaki', hex: 0x94826b },
+      { name: 'Acid Neon Green', hex: 0x22e033 },
+      { name: 'Snow White Joggers', hex: 0xdddddf },
+      { name: 'Cyber Pink Denim', hex: 0xff0055 }
+    ];
+
     const AVATAR_GEO = {
       torso: new THREE.BoxGeometry(0.85, 1.1, 0.5),
       head: new THREE.DodecahedronGeometry(0.38),
+      capCrown: new THREE.BoxGeometry(0.58, 0.22, 0.58),
+      capBrim: new THREE.BoxGeometry(0.54, 0.05, 0.38),
+      beanie: new THREE.CylinderGeometry(0.38, 0.42, 0.35, 12),
       upperArm: new THREE.BoxGeometry(0.24, 0.55, 0.24),
       lowerArm: new THREE.BoxGeometry(0.22, 0.55, 0.22),
       hand: new THREE.BoxGeometry(0.18, 0.22, 0.18),
@@ -1214,7 +2022,134 @@
       earcup: new THREE.CylinderGeometry(0.12, 0.12, 0.1, 12)
     };
 
-    function createAvatarRig(colorHex, accessoryBitmask = 7) {
+    function createNameTagSprite(name = 'Raver', handle = '') {
+      const cvs = document.createElement('canvas');
+      cvs.width = 512;
+      cvs.height = 128;
+      const ctx = cvs.getContext('2d');
+
+      ctx.fillStyle = 'rgba(9, 11, 18, 0.85)';
+      ctx.strokeStyle = '#00f0ff';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.roundRect(16, 16, 480, 96, 20);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#00f0ff';
+      ctx.font = 'bold 36px "Chakra Petch", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(name.toUpperCase(), 256, handle ? 48 : 64);
+
+      if (handle) {
+        ctx.fillStyle = '#ff0055';
+        ctx.font = '22px monospace';
+        ctx.fillText(handle.startsWith('@') ? handle : '@' + handle, 256, 86);
+      }
+
+      const tex = new THREE.CanvasTexture(cvs);
+      const spriteMat = new THREE.SpriteMaterial({ map: tex, transparent: true });
+      const sprite = new THREE.Sprite(spriteMat);
+      sprite.scale.set(3.6, 0.9, 1);
+      sprite.position.set(0, 2.7, 0);
+      return { sprite, canvas: cvs, texture: tex };
+    }
+
+    function updateNameTag(tagObj, name, handle) {
+      const cvs = tagObj.canvas;
+      const ctx = cvs.getContext('2d');
+      ctx.clearRect(0, 0, 512, 128);
+
+      ctx.fillStyle = 'rgba(9, 11, 18, 0.85)';
+      ctx.strokeStyle = '#00f0ff';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.roundRect(16, 16, 480, 96, 20);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#00f0ff';
+      ctx.font = 'bold 36px "Chakra Petch", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(name.toUpperCase(), 256, handle ? 48 : 64);
+
+      if (handle) {
+        ctx.fillStyle = '#ff0055';
+        ctx.font = '22px monospace';
+        ctx.fillText(handle.startsWith('@') ? handle : '@' + handle, 256, 86);
+      }
+      tagObj.texture.needsUpdate = true;
+    }
+
+    // 3D Speech Bubble Creator
+    function createSpeechBubbleSprite(text, name) {
+      const cvs = document.createElement('canvas');
+      cvs.width = 512;
+      cvs.height = 192;
+      const ctx = cvs.getContext('2d');
+
+      ctx.fillStyle = 'rgba(12, 14, 24, 0.95)';
+      ctx.strokeStyle = '#00f0ff';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.roundRect(16, 16, 480, 130, 24);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#00f0ff';
+      ctx.beginPath();
+      ctx.moveTo(240, 146);
+      ctx.lineTo(256, 175);
+      ctx.lineTo(272, 146);
+      ctx.fill();
+
+      ctx.fillStyle = '#ff0055';
+      ctx.font = 'bold 24px monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText(name.toUpperCase() + ':', 36, 52);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 28px sans-serif';
+      const maxLen = 30;
+      const line1 = text.length > maxLen ? text.slice(0, maxLen) : text;
+      const line2 = text.length > maxLen ? text.slice(maxLen, maxLen * 2) : '';
+      ctx.fillText(line1, 36, line2 ? 85 : 100);
+      if (line2) ctx.fillText(line2, 36, 122);
+
+      const tex = new THREE.CanvasTexture(cvs);
+      const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
+      const sprite = new THREE.Sprite(mat);
+      sprite.scale.set(4.6, 1.7, 1);
+      sprite.position.set(0, 4.0, 0);
+      return sprite;
+    }
+
+    function showAvatarSpeech(parentGroup, text, name, duration = 5.0) {
+      if (parentGroup.currentSpeechBubble) {
+        parentGroup.remove(parentGroup.currentSpeechBubble);
+      }
+      const bubble = createSpeechBubbleSprite(text, name);
+      parentGroup.add(bubble);
+      parentGroup.currentSpeechBubble = bubble;
+
+      let age = 0;
+      const timer = setInterval(() => {
+        age += 0.2;
+        if (age >= duration) {
+          clearInterval(timer);
+          if (parentGroup.currentSpeechBubble === bubble) {
+            parentGroup.remove(bubble);
+            parentGroup.currentSpeechBubble = null;
+          }
+        } else if (age > duration - 1.0) {
+          bubble.material.opacity = (duration - age);
+        }
+      }, 200);
+    }
+
+    function createAvatarRig(colorHex, accessoryBitmask = 7, skinHex = 0x2e1c14, hairHex = 0x00f0ff, pantsHex = 0x161d2d, name = 'Raver', handle = '', hairStyleIdx = 1) {
       const root = new THREE.Group();
 
       const bodyMat = new THREE.MeshStandardMaterial({
@@ -1222,10 +2157,20 @@
         roughness: 0.6,
         metalness: 0.2
       });
+      const pantsMat = new THREE.MeshStandardMaterial({
+        color: pantsHex,
+        roughness: 0.7,
+        metalness: 0.15
+      });
       const skinMat = new THREE.MeshStandardMaterial({
-        color: 0x1f1f26,
+        color: skinHex,
         roughness: 0.8,
         metalness: 0.1
+      });
+      const hairMat = new THREE.MeshStandardMaterial({
+        color: hairHex,
+        roughness: 0.5,
+        metalness: 0.25
       });
       const metallicMat = new THREE.MeshStandardMaterial({
         color: 0xffd700,
@@ -1256,6 +2201,40 @@
       const head = new THREE.Mesh(AVATAR_GEO.head, skinMat);
       head.position.y = 0.38;
       neck.add(head);
+
+      // Modular Hair / Headwear styles
+      const hairGroup = new THREE.Group();
+      head.add(hairGroup);
+
+      // Style 1: Snapback Forward
+      const capFwd = new THREE.Group();
+      const crownF = new THREE.Mesh(AVATAR_GEO.capCrown, hairMat);
+      crownF.position.y = 0.22;
+      const brimF = new THREE.Mesh(AVATAR_GEO.capBrim, hairMat);
+      brimF.position.set(0, 0.14, 0.36);
+      capFwd.add(crownF, brimF);
+
+      // Style 2: Snapback Backward
+      const capBwd = new THREE.Group();
+      const crownB = new THREE.Mesh(AVATAR_GEO.capCrown, hairMat);
+      crownB.position.y = 0.22;
+      const brimB = new THREE.Mesh(AVATAR_GEO.capBrim, hairMat);
+      brimB.position.set(0, 0.14, -0.36);
+      capBwd.add(crownB, brimB);
+
+      // Style 3: Beanie
+      const beanie = new THREE.Mesh(AVATAR_GEO.beanie, hairMat);
+      beanie.position.y = 0.26;
+
+      hairGroup.add(capFwd, capBwd, beanie);
+      const hairStyles = [null, capFwd, capBwd, beanie];
+
+      function setHairStyle(idx) {
+        capFwd.visible = (idx === 1);
+        capBwd.visible = (idx === 2);
+        beanie.visible = (idx === 3);
+      }
+      setHairStyle(hairStyleIdx);
 
       // Accessories
       const accessories = new THREE.Group();
@@ -1295,7 +2274,7 @@
           hipShoulder.position.set(isLeft ? -0.28 : 0.28, 0, 0);
           pelvis.add(hipShoulder);
 
-          const upper = new THREE.Mesh(AVATAR_GEO.thigh, bodyMat);
+          const upper = new THREE.Mesh(AVATAR_GEO.thigh, pantsMat);
           upper.position.y = -0.32;
           hipShoulder.add(upper);
 
@@ -1303,7 +2282,7 @@
           knee.position.y = -0.32;
           upper.add(knee);
 
-          const lower = new THREE.Mesh(AVATAR_GEO.calf, skinMat);
+          const lower = new THREE.Mesh(AVATAR_GEO.calf, pantsMat);
           lower.position.y = -0.32;
           knee.add(lower);
 
@@ -1341,6 +2320,10 @@
       const leftArm = buildLimb(true, false);
       const rightArm = buildLimb(false, false);
 
+      // Floating Name Tag
+      const nameTag = createNameTagSprite(name, handle);
+      root.add(nameTag.sprite);
+
       return {
         root,
         pelvis,
@@ -1351,6 +2334,12 @@
         chain,
         hpGroup,
         bodyMat,
+        pantsMat,
+        skinMat,
+        hairMat,
+        hairGroup,
+        setHairStyle,
+        nameTag,
         leftLeg,
         rightLeg,
         leftArm,
@@ -1422,7 +2411,7 @@
           tRElbowX = -0.6 - Math.cos(hypeBeat) * 0.3;
           break;
 
-        case 4: // Jump / Float in Air
+        case 4: // Jump / Jetpack Rocket Boost Float
           tPelvisY = 1.6;
           tTorsoX = -0.15;
           tLLegX = 0.5;
@@ -1441,6 +2430,36 @@
           tPelvisY = 1.6 - Math.abs(beatSin) * 0.08;
           tLArmX = -0.2;
           tRArmX = -0.2;
+          break;
+
+        case 6: // Breakdance Power Move (Hallucinate 'Y')
+          const bdTime = elapsed * 7.5;
+          tPelvisY = 0.55 + Math.abs(Math.sin(bdTime)) * 0.2;
+          tTorsoX = Math.sin(bdTime) * 1.1;
+          tTorsoY = Math.cos(bdTime) * 1.8;
+          tHeadX = -0.35;
+          tLLegX = Math.sin(bdTime) * 1.6;
+          tRLegX = -Math.sin(bdTime) * 1.6;
+          tLKneeX = 0.7;
+          tRKneeX = 0.7;
+          tLArmX = -1.3 + Math.cos(bdTime) * 0.7;
+          tRArmX = -1.3 - Math.cos(bdTime) * 0.7;
+          tLArmZ = 0.85;
+          tRArmZ = -0.85;
+          break;
+
+        case 7: // Rave Wave Hands Emote (Hallucinate 'V')
+          const waveTime = elapsed * 6.0;
+          tPelvisY = 1.6 + Math.abs(Math.sin(waveTime * 0.5)) * 0.1;
+          tTorsoX = 0.05;
+          tTorsoY = Math.sin(waveTime) * 0.15;
+          tHeadX = -0.2 + Math.sin(waveTime) * 0.1;
+          tLArmX = -2.7 + Math.sin(waveTime) * 0.4;
+          tRArmX = -2.7 - Math.sin(waveTime) * 0.4;
+          tLArmZ = 0.45 + Math.sin(waveTime) * 0.25;
+          tRArmZ = -0.45 - Math.sin(waveTime) * 0.25;
+          tLElbowX = -0.35;
+          tRElbowX = -0.35;
           break;
 
         case 0: // Idle
@@ -1469,27 +2488,60 @@
       rig.leftArm.jointA.rotation.z += (tLArmZ - rig.leftArm.jointA.rotation.z) * lerpSpeed;
       rig.leftArm.jointB.rotation.x += (tLElbowX - rig.leftArm.jointB.rotation.x) * lerpSpeed;
 
-      rig.rightArm.jointA.rotation.x += (tRArmX - rig.rightArm.jointA.rotation.x) * lerpSpeed;
-      rig.rightArm.jointA.rotation.z += (tRArmZ - rig.rightArm.jointA.rotation.z) * lerpSpeed;
       rig.rightArm.jointB.rotation.x += (tRElbowX - rig.rightArm.jointB.rotation.x) * lerpSpeed;
     }
 
+
     /* =========================================================================
-       6. LOCAL PLAYER CONTROLLER & THIRD-PERSON CAMERA
+       6. LOCAL PLAYER CONTROLLER & HALLUCINATE ACTION CONTROLS
        ========================================================================= */
     const player = {
       position: new THREE.Vector3(0, 0, 10),
       velocity: new THREE.Vector3(),
       rotationY: 0,
       animState: 0,
+      nickname: 'Raver_01',
+      handle: '',
       colorIdx: 1,
+      hairColorIdx: 0,
+      skinToneIdx: 1,
+      hairStyleIdx: 1,
+      bottomColorIdx: 0,
       accessories: 7,
       isGrounded: true,
       rig: null
     };
 
-    player.rig = createAvatarRig(PALETTES[player.colorIdx].hex, player.accessories);
+    player.rig = createAvatarRig(
+      PALETTES[player.colorIdx].hex,
+      player.accessories,
+      SKIN_TONES[player.skinToneIdx].hex,
+      HAIR_COLORS[player.hairColorIdx].hex,
+      PANTS_PALETTES[player.bottomColorIdx].hex,
+      player.nickname,
+      player.handle,
+      player.hairStyleIdx
+    );
     scene.add(player.rig.root);
+
+    // Camera Rig & Multi-Mode View System (Hallucinate 'T')
+    const CAMERA_MODES = [
+      { name: '3RD-PERSON CHASE', id: 0 },
+      { name: '1ST-PERSON POV', id: 1 },
+      { name: 'VIP FRONT STAGE', id: 2 },
+      { name: 'DJ DECK OVERHEAD', id: 3 }
+    ];
+    let currentCamModeIdx = 0;
+
+    function cycleCameraMode() {
+      currentCamModeIdx = (currentCamModeIdx + 1) % CAMERA_MODES.length;
+      showToast(`🎥 CAMERA VIEW: ${CAMERA_MODES[currentCamModeIdx].name}`);
+      const pill = document.getElementById('pill-t');
+      if (pill) {
+        pill.classList.add('active');
+        setTimeout(() => pill.classList.remove('active'), 250);
+      }
+    }
 
     const cameraRig = {
       yaw: 0,
@@ -1499,32 +2551,245 @@
       isLocked: false
     };
 
+    // Chat System (Hallucinate SPACE)
+    const chatOverlay = document.getElementById('chat-overlay');
+    const chatInput = document.getElementById('chat-input');
+    let isChatOpen = false;
+
+    function openChat() {
+      if (isChatOpen) return;
+      isChatOpen = true;
+      if (chatOverlay) chatOverlay.classList.add('visible');
+      if (chatInput) {
+        chatInput.value = '';
+        setTimeout(() => chatInput.focus(), 50);
+      }
+    }
+
+    function closeChat() {
+      if (!isChatOpen) return;
+      isChatOpen = false;
+      if (chatOverlay) chatOverlay.classList.remove('visible');
+      if (chatInput) chatInput.blur();
+    }
+
+    function submitChat() {
+      const msg = (chatInput?.value || '').trim();
+      if (msg) {
+        showAvatarSpeech(player.rig.root, msg, player.nickname);
+        if (sendChatAction) {
+          sendChatAction({ text: msg, nick: player.nickname, handle: player.handle });
+        }
+      }
+      closeChat();
+    }
+
+    chatInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        submitChat();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        closeChat();
+      }
+    });
+
+    // Particle Action Triggers (Hallucinate C, N, B)
+    function triggerBubbles() {
+      spawnBubbles(player.position.x, player.position.y, player.position.z, 20);
+      if (sendFxAction) {
+        sendFxAction({ type: 'bubbles', x: player.position.x, y: player.position.y, z: player.position.z });
+      }
+      showToast('🫧 PARTY BUBBLES RELEASED!');
+      const pill = document.getElementById('pill-c');
+      if (pill) {
+        pill.classList.add('active');
+        setTimeout(() => pill.classList.remove('active'), 250);
+      }
+    }
+
+    function triggerFoam() {
+      spawnFoam(player.position.x, player.position.y, player.position.z, player.rotationY + Math.PI, 30);
+      if (sendFxAction) {
+        sendFxAction({ type: 'foam', x: player.position.x, y: player.position.y, z: player.position.z, dirAngle: player.rotationY + Math.PI });
+      }
+      showToast('💨 RAVE CO2 FOAM BLAST!');
+      const pill = document.getElementById('pill-n');
+      if (pill) {
+        pill.classList.add('active');
+        setTimeout(() => pill.classList.remove('active'), 250);
+      }
+    }
+
+    function triggerJetpack() {
+      player.velocity.y = 17.0;
+      player.isGrounded = false;
+      player.animState = 4;
+      spawnJetpackSparks(player.position.x, player.position.y, player.position.z);
+      showToast('🚀 JETPACK ROCKET BOOST!');
+      const pill = document.getElementById('pill-b');
+      if (pill) {
+        pill.classList.add('active');
+        setTimeout(() => pill.classList.remove('active'), 250);
+      }
+    }
+
+    function triggerBreakdance() {
+      setEmote(6);
+      showToast('🔥 BREAKDANCE POWER MOVE!');
+      const pill = document.getElementById('pill-y');
+      if (pill) {
+        pill.classList.add('active');
+        setTimeout(() => pill.classList.remove('active'), 250);
+      }
+    }
+
+    function triggerWave() {
+      setEmote(7);
+      showToast('🙌 CROWD HYPE WAVE!');
+      const pill = document.getElementById('pill-v');
+      if (pill) {
+        pill.classList.add('active');
+        setTimeout(() => pill.classList.remove('active'), 250);
+      }
+    }
+
+    function toggleSunglasses() {
+      const visorCheck = document.getElementById('acc-visor');
+      if (visorCheck) {
+        visorCheck.checked = !visorCheck.checked;
+        updateAccessoriesFromUI();
+        showToast(visorCheck.checked ? '🕶️ SUNGLASSES ON' : '🕶️ SUNGLASSES OFF');
+      }
+    }
+
+    // Help Modal
+    const helpModal = document.getElementById('help-modal');
+    function toggleHelpModal() {
+      if (helpModal) {
+        helpModal.classList.toggle('visible');
+      }
+    }
+    document.getElementById('close-help')?.addEventListener('click', () => {
+      helpModal?.classList.remove('visible');
+    });
+
+    // Avatar Cycling Helpers (Keys 7/8, 9/0, U/I, O/P, J/K, L/;, M/,)
+    function cycleHairColor(dir = 1) {
+      player.hairColorIdx = (player.hairColorIdx + dir + HAIR_COLORS.length) % HAIR_COLORS.length;
+      player.rig.hairMat.color.setHex(HAIR_COLORS[player.hairColorIdx].hex);
+      showToast(`💇 HAIR COLOR: ${HAIR_COLORS[player.hairColorIdx].name}`);
+      broadcastPlayerTransform();
+    }
+
+    function cycleSkinTone(dir = 1) {
+      player.skinToneIdx = (player.skinToneIdx + dir + SKIN_TONES.length) % SKIN_TONES.length;
+      player.rig.skinMat.color.setHex(SKIN_TONES[player.skinToneIdx].hex);
+      showToast(`👤 SKIN TONE: ${SKIN_TONES[player.skinToneIdx].name}`);
+      broadcastPlayerTransform();
+    }
+
+    function cycleHairStyle(dir = 1) {
+      const STYLES = ['Buzz Cut', 'Snapback Fwd', 'Snapback Bwd', 'Beanie'];
+      player.hairStyleIdx = (player.hairStyleIdx + dir + 4) % 4;
+      player.rig.setHairStyle(player.hairStyleIdx);
+      showToast(`🧢 HEADWEAR: ${STYLES[player.hairStyleIdx]}`);
+      broadcastPlayerTransform();
+    }
+
+    function cycleAccessories() {
+      player.accessories = (player.accessories + 1) % 8;
+      updateAccessoriesFromMask(player.accessories);
+      showToast(`✨ ACCESSORIES BITMASK: ${player.accessories}`);
+      broadcastPlayerTransform();
+    }
+
+    function cycleTopWearColor(dir = 1) {
+      player.colorIdx = (player.colorIdx + dir + PALETTES.length) % PALETTES.length;
+      player.rig.bodyMat.color.setHex(PALETTES[player.colorIdx].hex);
+      showToast(`👕 TOP WEAR: ${PALETTES[player.colorIdx].name}`);
+      broadcastPlayerTransform();
+    }
+
+    function cycleBottomWearColor(dir = 1) {
+      player.bottomColorIdx = (player.bottomColorIdx + dir + PANTS_PALETTES.length) % PANTS_PALETTES.length;
+      player.rig.pantsMat.color.setHex(PANTS_PALETTES[player.bottomColorIdx].hex);
+      showToast(`👖 BOTTOM WEAR: ${PANTS_PALETTES[player.bottomColorIdx].name}`);
+      broadcastPlayerTransform();
+    }
+
+    function cycleDanceMove(dir = 1) {
+      const DANCES = [0, 2, 3, 5, 6, 7];
+      let curr = DANCES.indexOf(player.animState);
+      if (curr === -1) curr = 0;
+      const nextIdx = (curr + dir + DANCES.length) % DANCES.length;
+      setEmote(DANCES[nextIdx]);
+      const names = ['Idle', 'Bounce 135BPM', 'Hype Arms', 'Head Nod', 'Breakdance', 'Wave Hands'];
+      showToast(`💃 DANCE MOVE: ${names[nextIdx]}`);
+    }
+
+    // Keyboard Controller
     const keys = {};
     window.addEventListener('keydown', (e) => {
+      if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
+        return;
+      }
+
       keys[e.code] = true;
 
-      if (e.code === 'Digit1') setEmote(0);
-      if (e.code === 'Digit2') setEmote(2);
-      if (e.code === 'Digit3') setEmote(3);
-      if (e.code === 'Digit4') setEmote(5);
-      if (e.code === 'KeyC') toggleCustomizer();
+      // Hallucinate Shortcuts
+      if (e.code === 'KeyC') { triggerBubbles(); }
+      else if (e.code === 'KeyN') { triggerFoam(); }
+      else if (e.code === 'KeyB') { triggerJetpack(); }
+      else if (e.code === 'KeyY') { triggerBreakdance(); }
+      else if (e.code === 'KeyV') { triggerWave(); }
+      else if (e.code === 'KeyT') { cycleCameraMode(); }
+      else if (e.code === 'KeyF') { takePhotoSnapshot(); }
+      else if (e.code === 'KeyG') { toggleSunglasses(); }
+      else if (e.code === 'KeyH' || e.code === 'Slash') { toggleHelpModal(); }
+      else if (e.code === 'Tab') { e.preventDefault(); toggleCustomizer(); }
+      else if (e.code === 'Space') { e.preventDefault(); openChat(); }
+      else if (e.code === 'Digit7') { cycleHairColor(-1); }
+      else if (e.code === 'Digit8') { cycleHairColor(1); }
+      else if (e.code === 'Digit9') { cycleSkinTone(-1); }
+      else if (e.code === 'Digit0') { cycleSkinTone(1); }
+      else if (e.code === 'KeyU') { cycleHairStyle(-1); }
+      else if (e.code === 'KeyI') { cycleHairStyle(1); }
+      else if (e.code === 'KeyO' || e.code === 'KeyP') { cycleAccessories(); }
+      else if (e.code === 'KeyJ') { cycleTopWearColor(-1); }
+      else if (e.code === 'KeyK') { cycleTopWearColor(1); }
+      else if (e.code === 'KeyL') { cycleDanceMove(-1); }
+      else if (e.code === 'Semicolon') { cycleDanceMove(1); }
+      else if (e.code === 'KeyM') { cycleBottomWearColor(-1); }
+      else if (e.code === 'Comma') { cycleBottomWearColor(1); }
+
+      updateMovementPills();
     });
 
     window.addEventListener('keyup', (e) => {
       keys[e.code] = false;
+      updateMovementPills();
     });
 
+    function updateMovementPills() {
+      document.getElementById('pill-w')?.classList.toggle('active', !!(keys['KeyW'] || keys['ArrowUp']));
+      document.getElementById('pill-a')?.classList.toggle('active', !!(keys['KeyA'] || keys['ArrowLeft']));
+      document.getElementById('pill-s')?.classList.toggle('active', !!(keys['KeyS'] || keys['ArrowDown']));
+      document.getElementById('pill-d')?.classList.toggle('active', !!(keys['KeyD'] || keys['ArrowRight']));
+    }
+
+    // Pointer Lock & Mouse Look
     const crosshair = document.getElementById('crosshair');
 
     glCanvas.addEventListener('click', () => {
-      if (!cameraRig.isLocked) {
+      if (!cameraRig.isLocked && !isChatOpen) {
         glCanvas.requestPointerLock();
       }
     });
 
     document.addEventListener('pointerlockchange', () => {
       cameraRig.isLocked = document.pointerLockElement === glCanvas;
-      crosshair.classList.toggle('locked', cameraRig.isLocked);
+      crosshair?.classList.toggle('locked', cameraRig.isLocked);
     });
 
     document.addEventListener('mousemove', (e) => {
@@ -1537,15 +2802,75 @@
 
     window.addEventListener('wheel', (e) => {
       cameraRig.targetDistance += e.deltaY * 0.005;
-      cameraRig.targetDistance = Math.max(3.2, Math.min(14.0, cameraRig.targetDistance));
+      cameraRig.targetDistance = Math.max(2.8, Math.min(14.0, cameraRig.targetDistance));
     }, { passive: true });
 
     function setEmote(stateId) {
       player.animState = stateId;
-      document.querySelectorAll('.emote-btn[data-emote]').forEach(btn => {
-        btn.classList.toggle('active', parseInt(btn.dataset.emote) === stateId);
-      });
     }
+
+    // Attach Click Handlers to All Hallucinate UI Keycaps & Dock elements
+    document.querySelectorAll('.keycap-box[data-action]').forEach(box => {
+      box.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const act = box.dataset.action;
+        if (act === 'hair-color') cycleHairColor(1);
+        else if (act === 'skin-tone') cycleSkinTone(1);
+        else if (act === 'hair-style') cycleHairStyle(1);
+        else if (act === 'accessories') cycleAccessories();
+        else if (act === 'top-wear') cycleTopWearColor(1);
+        else if (act === 'dance-moves') cycleDanceMove(1);
+        else if (act === 'bottom-wear') cycleBottomWearColor(1);
+      });
+    });
+
+    document.getElementById('pill-tab')?.addEventListener('click', (e) => { e.stopPropagation(); toggleCustomizer(); });
+    document.getElementById('pill-g')?.addEventListener('click', (e) => { e.stopPropagation(); toggleSunglasses(); });
+    document.getElementById('pill-t')?.addEventListener('click', (e) => { e.stopPropagation(); cycleCameraMode(); });
+    document.getElementById('pill-f')?.addEventListener('click', (e) => { e.stopPropagation(); takePhotoSnapshot(); });
+    document.getElementById('pill-y')?.addEventListener('click', (e) => { e.stopPropagation(); triggerBreakdance(); });
+    document.getElementById('pill-space')?.addEventListener('click', (e) => { e.stopPropagation(); openChat(); });
+    document.getElementById('pill-c')?.addEventListener('click', (e) => { e.stopPropagation(); triggerBubbles(); });
+    document.getElementById('pill-v')?.addEventListener('click', (e) => { e.stopPropagation(); triggerWave(); });
+    document.getElementById('pill-b')?.addEventListener('click', (e) => { e.stopPropagation(); triggerJetpack(); });
+    document.getElementById('pill-n')?.addEventListener('click', (e) => { e.stopPropagation(); triggerFoam(); });
+    document.getElementById('pill-h')?.addEventListener('click', (e) => { e.stopPropagation(); toggleHelpModal(); });
+
+    // Movement cluster click / touch support
+    ['w', 'a', 's', 'd'].forEach(k => {
+      const el = document.getElementById(`pill-${k}`);
+      if (!el) return;
+      const code = `Key${k.toUpperCase()}`;
+      el.addEventListener('mousedown', () => { keys[code] = true; updateMovementPills(); });
+      el.addEventListener('mouseup', () => { keys[code] = false; updateMovementPills(); });
+      el.addEventListener('mouseleave', () => { keys[code] = false; updateMovementPills(); });
+      el.addEventListener('touchstart', (e) => { e.preventDefault(); keys[code] = true; updateMovementPills(); });
+      el.addEventListener('touchend', (e) => { e.preventDefault(); keys[code] = false; updateMovementPills(); });
+    });
+
+    // Intro Gate Enter Festival Handler
+    const introGate = document.getElementById('intro-gate');
+    const introNickInput = document.getElementById('intro-nickname');
+    const introHandleInput = document.getElementById('intro-handle');
+    const btnEnterGate = document.getElementById('btn-enter-gate');
+
+    function enterFestival() {
+      const nick = (introNickInput?.value || '').trim() || 'Raver_' + Math.floor(Math.random() * 900 + 100);
+      const handle = (introHandleInput?.value || '').trim();
+      player.nickname = nick;
+      player.handle = handle;
+      if (player.rig && player.rig.nameTag) {
+        updateNameTag(player.rig.nameTag, nick, handle);
+      }
+      if (introGate) introGate.classList.add('hidden');
+      ensurePlaybackAndAudio();
+      showToast(`🔥 WELCOME TO OCTANE 3D, ${nick.toUpperCase()}! [PRESS H FOR CONTROLS]`);
+      broadcastPlayerTransform();
+    }
+
+    btnEnterGate?.addEventListener('click', enterFestival);
+    introNickInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') enterFestival(); });
+    introHandleInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') enterFestival(); });
 
     /* =========================================================================
        7. ZERO-COST P2P NETWORKING (Trystero BitTorrent Tracker)
@@ -1554,6 +2879,8 @@
     let p2pRoom = null;
     let sendTransformAction = null;
     let sendSyncAction = null;
+    let sendChatAction = null;
+    let sendFxAction = null;
 
     function initNetworking() {
       try {
@@ -1561,8 +2888,13 @@
 
         const [sendTransform, getTransform] = p2pRoom.makeAction('tx');
         const [sendSync, getSync] = p2pRoom.makeAction('sync');
+        const [sendChat, getChat] = p2pRoom.makeAction('chat');
+        const [sendFx, getFx] = p2pRoom.makeAction('fx');
+
         sendTransformAction = sendTransform;
         sendSyncAction = sendSync;
+        sendChatAction = sendChat;
+        sendFxAction = sendFx;
 
         p2pRoom.onPeerJoin((peerId) => {
           updateCrowdCounter();
@@ -1580,14 +2912,46 @@
           updateCrowdCounter();
         });
 
+        getChat((data, peerId) => {
+          const peer = remotePeers.get(peerId);
+          if (peer && peer.rig && data && data.text) {
+            showAvatarSpeech(peer.rig.root, data.text, data.nick || peer.nickname || 'Raver');
+          }
+        });
+
+        getFx((data) => {
+          if (!data) return;
+          if (data.type === 'bubbles') {
+            spawnBubbles(data.x, data.y, data.z);
+          } else if (data.type === 'foam') {
+            spawnFoam(data.x, data.y, data.z, data.dirAngle);
+          }
+        });
+
         getTransform((packet, peerId) => {
           if (!Array.isArray(packet) || packet.length < 7) return;
 
-          const [x, y, z, rotY, animState, colorIdx, accessories] = packet;
+          const [x, y, z, rotY, animState, colorIdx, accessories, hairColorIdx, skinToneIdx, bottomColorIdx, hairStyleIdx, nick, handle] = packet;
           let peer = remotePeers.get(peerId);
 
           if (!peer) {
-            const rig = createAvatarRig(PALETTES[colorIdx % PALETTES.length].hex, accessories);
+            const safeColor = colorIdx || 0;
+            const safeSkin = (skinToneIdx !== undefined) ? SKIN_TONES[skinToneIdx % SKIN_TONES.length].hex : 0x2e1c14;
+            const safeHair = (hairColorIdx !== undefined) ? HAIR_COLORS[hairColorIdx % HAIR_COLORS.length].hex : 0x00f0ff;
+            const safePants = (bottomColorIdx !== undefined) ? PANTS_PALETTES[bottomColorIdx % PANTS_PALETTES.length].hex : 0x161d2d;
+            const safeStyle = (hairStyleIdx !== undefined) ? hairStyleIdx : 1;
+            const safeNick = nick || 'Raver';
+
+            const rig = createAvatarRig(
+              PALETTES[safeColor % PALETTES.length].hex,
+              accessories,
+              safeSkin,
+              safeHair,
+              safePants,
+              safeNick,
+              handle || '',
+              safeStyle
+            );
             scene.add(rig.root);
             peer = {
               rig,
@@ -1596,6 +2960,12 @@
               animState: animState,
               colorIdx: colorIdx,
               accessories: accessories,
+              hairColorIdx: hairColorIdx || 0,
+              skinToneIdx: skinToneIdx || 0,
+              bottomColorIdx: bottomColorIdx || 0,
+              hairStyleIdx: hairStyleIdx || 1,
+              nickname: safeNick,
+              handle: handle || '',
               speed: 0,
               lastSeen: performance.now()
             };
@@ -1610,6 +2980,22 @@
             if (peer.colorIdx !== colorIdx) {
               peer.colorIdx = colorIdx;
               peer.rig.bodyMat.color.setHex(PALETTES[colorIdx % PALETTES.length].hex);
+            }
+            if (hairColorIdx !== undefined && peer.hairColorIdx !== hairColorIdx) {
+              peer.hairColorIdx = hairColorIdx;
+              peer.rig.hairMat.color.setHex(HAIR_COLORS[hairColorIdx % HAIR_COLORS.length].hex);
+            }
+            if (skinToneIdx !== undefined && peer.skinToneIdx !== skinToneIdx) {
+              peer.skinToneIdx = skinToneIdx;
+              peer.rig.skinMat.color.setHex(SKIN_TONES[skinToneIdx % SKIN_TONES.length].hex);
+            }
+            if (bottomColorIdx !== undefined && peer.bottomColorIdx !== bottomColorIdx) {
+              peer.bottomColorIdx = bottomColorIdx;
+              peer.rig.pantsMat.color.setHex(PANTS_PALETTES[bottomColorIdx % PANTS_PALETTES.length].hex);
+            }
+            if (hairStyleIdx !== undefined && peer.hairStyleIdx !== hairStyleIdx) {
+              peer.hairStyleIdx = hairStyleIdx;
+              peer.rig.setHairStyle(hairStyleIdx);
             }
             if (peer.accessories !== accessories) {
               peer.accessories = accessories;
@@ -1661,7 +3047,13 @@
         Math.round(player.rotationY * 100) / 100,
         player.animState,
         player.colorIdx,
-        player.accessories
+        player.accessories,
+        player.hairColorIdx,
+        player.skinToneIdx,
+        player.bottomColorIdx,
+        player.hairStyleIdx,
+        player.nickname,
+        player.handle
       ];
       sendTransformAction(packet);
     }
@@ -1686,7 +3078,8 @@
 
     function updateCrowdCounter() {
       const totalCount = remotePeers.size + 1;
-      document.getElementById('crowd-count').textContent = `CROWD: ${totalCount} / ${CONFIG.maxPeers}`;
+      const el = document.getElementById('crowd-count');
+      if (el) el.textContent = `CROWD: ${totalCount} / ${CONFIG.maxPeers}`;
     }
 
     /* =========================================================================
@@ -1696,20 +3089,22 @@
     const visorOverlay = document.getElementById('visor-overlay');
 
     const paletteContainer = document.getElementById('palette-picker');
-    PALETTES.forEach((p, idx) => {
-      const chip = document.createElement('div');
-      chip.className = `color-chip ${idx === player.colorIdx ? 'selected' : ''}`;
-      chip.style.backgroundColor = p.css;
-      chip.title = p.name;
-      chip.addEventListener('click', () => {
-        player.colorIdx = idx;
-        player.rig.bodyMat.color.setHex(p.hex);
-        document.querySelectorAll('.color-chip').forEach(c => c.classList.remove('selected'));
-        chip.classList.add('selected');
-        broadcastPlayerTransform();
+    if (paletteContainer) {
+      PALETTES.forEach((p, idx) => {
+        const chip = document.createElement('div');
+        chip.className = `color-chip ${idx === player.colorIdx ? 'selected' : ''}`;
+        chip.style.backgroundColor = p.css;
+        chip.title = p.name;
+        chip.addEventListener('click', () => {
+          player.colorIdx = idx;
+          player.rig.bodyMat.color.setHex(p.hex);
+          document.querySelectorAll('.color-chip').forEach(c => c.classList.remove('selected'));
+          chip.classList.add('selected');
+          broadcastPlayerTransform();
+        });
+        paletteContainer.appendChild(chip);
       });
-      paletteContainer.appendChild(chip);
-    });
+    }
 
     const visorCheck = document.getElementById('acc-visor');
     const chainCheck = document.getElementById('acc-chain');
@@ -1717,29 +3112,38 @@
 
     function updateAccessoriesFromUI() {
       let mask = 0;
-      if (visorCheck.checked) mask |= 1;
-      if (chainCheck.checked) mask |= 2;
-      if (hpCheck.checked) mask |= 4;
+      if (visorCheck?.checked) mask |= 1;
+      if (chainCheck?.checked) mask |= 2;
+      if (hpCheck?.checked) mask |= 4;
 
       player.accessories = mask;
-      player.rig.visor.visible = visorCheck.checked;
-      player.rig.chain.visible = chainCheck.checked;
-      player.rig.hpGroup.visible = hpCheck.checked;
+      if (player.rig) {
+        player.rig.visor.visible = (mask & 1) !== 0;
+        player.rig.chain.visible = (mask & 2) !== 0;
+        player.rig.hpGroup.visible = (mask & 4) !== 0;
+      }
 
-      visorOverlay.classList.toggle('active', visorCheck.checked);
+      visorOverlay?.classList.toggle('active', (mask & 1) !== 0);
       broadcastPlayerTransform();
     }
 
-    visorCheck.addEventListener('change', updateAccessoriesFromUI);
-    chainCheck.addEventListener('change', updateAccessoriesFromUI);
-    hpCheck.addEventListener('change', updateAccessoriesFromUI);
+    function updateAccessoriesFromMask(mask) {
+      if (visorCheck) visorCheck.checked = (mask & 1) !== 0;
+      if (chainCheck) chainCheck.checked = (mask & 2) !== 0;
+      if (hpCheck) hpCheck.checked = (mask & 4) !== 0;
+      updateAccessoriesFromUI();
+    }
+
+    visorCheck?.addEventListener('change', updateAccessoriesFromUI);
+    chainCheck?.addEventListener('change', updateAccessoriesFromUI);
+    hpCheck?.addEventListener('change', updateAccessoriesFromUI);
     updateAccessoriesFromUI();
 
     function toggleCustomizer() {
-      customizerPanel.classList.toggle('visible');
+      customizerPanel?.classList.toggle('visible');
     }
-    document.getElementById('btn-customizer').addEventListener('click', toggleCustomizer);
-    document.getElementById('close-customizer').addEventListener('click', () => customizerPanel.classList.remove('visible'));
+    document.getElementById('btn-customizer')?.addEventListener('click', toggleCustomizer);
+    document.getElementById('close-customizer')?.addEventListener('click', () => customizerPanel?.classList.remove('visible'));
 
     // Audio State & Continuous Playback System
     const btnSound = document.getElementById('btn-sound-toggle');
@@ -1749,13 +3153,13 @@
       const icon = document.getElementById('sound-icon');
       const text = document.getElementById('sound-text');
       if (isAudioUnmuted) {
-        icon.textContent = '🔊';
-        text.textContent = 'SOUND ON';
+        if (icon) icon.textContent = '🔊';
+        if (text) text.textContent = 'SOUND ON';
         btnSound.style.borderColor = 'var(--neon-lime)';
         btnSound.style.color = 'var(--neon-lime)';
       } else {
-        icon.textContent = '🔇';
-        text.textContent = 'CLICK FOR SOUND';
+        if (icon) icon.textContent = '🔇';
+        if (text) text.textContent = 'CLICK FOR SOUND';
         btnSound.style.borderColor = 'var(--neon-pink)';
         btnSound.style.color = 'var(--neon-pink)';
       }
@@ -1801,7 +3205,7 @@
     window.addEventListener('keydown', ensurePlaybackAndAudio);
     window.addEventListener('pointerdown', ensurePlaybackAndAudio);
 
-    btnSound.addEventListener('click', (e) => {
+    btnSound?.addEventListener('click', (e) => {
       e.stopPropagation();
       setConcertAudio(!isAudioUnmuted);
     });
@@ -1810,7 +3214,6 @@
     setInterval(() => {
       if (isYtReady && ytPlayer && ytPlayer.getPlayerState) {
         const state = ytPlayer.getPlayerState();
-        // State 1 = PLAYING, 3 = BUFFERING. If state is 2 (PAUSED), -1 (UNSTARTED), 0 (ENDED), 5 (CUED): FORCE PLAY!
         if (state !== 1 && state !== 3) {
           ytPlayer.playVideo();
         }
@@ -1818,35 +3221,14 @@
     }, 1200);
 
     // Periodic 24/7 Global Time-Sync Check (every 8s)
-    setInterval(sync247Stream, 8000);
-
-    document.querySelectorAll('.emote-btn[data-emote]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        setEmote(parseInt(btn.dataset.emote));
-      });
-    });
-
-    const btnSync = document.getElementById('btn-sync');
-    if (btnSync) {
-      btnSync.addEventListener('click', () => {
-        ensurePlaybackAndAudio();
-        showToast('STAGE AUDIO & SYNC TRIGGERED');
-      });
-    }
-
-    // Continuous Playback Watchdog: Guarantees video is ALWAYS playing
     setInterval(() => {
-      if (isYtReady && ytPlayer && ytPlayer.getPlayerState) {
-        const state = ytPlayer.getPlayerState();
-        // 2: paused, -1: unstarted, 0: ended, 5: video cued
-        if (state === 2 || state === -1 || state === 0 || state === 5) {
-          ytPlayer.playVideo();
-        }
-      }
-    }, 2500);
+      sync247Stream();
+      updateScheduleWallTexture();
+    }, 8000);
 
     function showToast(msg) {
       const toast = document.getElementById('toast-msg');
+      if (!toast) return;
       toast.textContent = msg;
       toast.style.opacity = '1';
       setTimeout(() => { toast.style.opacity = '0'; }, 3000);
@@ -1929,13 +3311,6 @@
         }
       }
 
-      // Jump Physics
-      if (keys['Space'] && player.isGrounded) {
-        player.velocity.y = CONFIG.jumpVelocity;
-        player.isGrounded = false;
-        player.animState = 4;
-      }
-
       if (!player.isGrounded) {
         player.velocity.y += CONFIG.gravity * delta;
       }
@@ -1963,29 +3338,49 @@
       const currentHorizontalSpeed = Math.hypot(player.velocity.x, player.velocity.z);
       updateAvatarKinematics(player.rig, player.animState, currentHorizontalSpeed, elapsed, delta);
 
-      // 3. Smooth Damped Third-Person Camera Follow
-      cameraRig.distance += (cameraRig.targetDistance - cameraRig.distance) * delta * 10.0;
+      // 3. Update Particle Systems
+      updateBubbles(delta, elapsed);
+      updateFoam(delta);
+      updateSparks(delta);
 
-      const camTargetPos = new THREE.Vector3(
-        player.position.x,
-        player.position.y + 1.8,
-        player.position.z
-      );
+      // 4. Multi-View Camera Controller
+      if (currentCamModeIdx === 0) {
+        // Mode 0: 3rd-Person Chase Follow
+        cameraRig.distance += (cameraRig.targetDistance - cameraRig.distance) * delta * 10.0;
+        const camTargetPos = new THREE.Vector3(player.position.x, player.position.y + 1.8, player.position.z);
+        const camOffsetX = Math.sin(cameraRig.yaw) * Math.cos(cameraRig.pitch) * cameraRig.distance;
+        const camOffsetY = Math.sin(cameraRig.pitch) * cameraRig.distance;
+        const camOffsetZ = Math.cos(cameraRig.yaw) * Math.cos(cameraRig.pitch) * cameraRig.distance;
+        const idealCamPos = new THREE.Vector3(
+          camTargetPos.x + camOffsetX,
+          Math.max(0.6, camTargetPos.y + camOffsetY),
+          camTargetPos.z + camOffsetZ
+        );
+        camera.position.lerp(idealCamPos, delta * 12.0);
+        camera.lookAt(camTargetPos);
+      } else if (currentCamModeIdx === 1) {
+        // Mode 1: 1st-Person POV
+        const eyePos = new THREE.Vector3(player.position.x, player.position.y + 2.0, player.position.z);
+        camera.position.copy(eyePos);
+        const lookDir = new THREE.Vector3(
+          -Math.sin(cameraRig.yaw) * Math.cos(cameraRig.pitch),
+          Math.sin(cameraRig.pitch),
+          -Math.cos(cameraRig.yaw) * Math.cos(cameraRig.pitch)
+        );
+        camera.lookAt(eyePos.clone().add(lookDir));
+      } else if (currentCamModeIdx === 2) {
+        // Mode 2: VIP Front Stage (facing the YouTube screen)
+        const vipPos = new THREE.Vector3(0, 3.2, CONFIG.stageZ + 36);
+        camera.position.lerp(vipPos, delta * 8.0);
+        camera.lookAt(0, 15, CONFIG.stageZ);
+      } else if (currentCamModeIdx === 3) {
+        // Mode 3: DJ Deck Overhead (looking out at the festival crowd)
+        const djPos = new THREE.Vector3(0, 6.5, CONFIG.stageZ + 11);
+        camera.position.lerp(djPos, delta * 8.0);
+        camera.lookAt(0, 2.0, 15);
+      }
 
-      const camOffsetX = Math.sin(cameraRig.yaw) * Math.cos(cameraRig.pitch) * cameraRig.distance;
-      const camOffsetY = Math.sin(cameraRig.pitch) * cameraRig.distance;
-      const camOffsetZ = Math.cos(cameraRig.yaw) * Math.cos(cameraRig.pitch) * cameraRig.distance;
-
-      const idealCamPos = new THREE.Vector3(
-        camTargetPos.x + camOffsetX,
-        Math.max(0.6, camTargetPos.y + camOffsetY),
-        camTargetPos.z + camOffsetZ
-      );
-
-      camera.position.lerp(idealCamPos, delta * 12.0);
-      camera.lookAt(camTargetPos);
-
-      // 4. Remote Peers Interpolation & Animation
+      // 5. Remote Peers Interpolation & Animation
       remotePeers.forEach((peer) => {
         peer.rig.root.position.lerp(peer.targetPos, delta * 14.0);
 
@@ -2002,7 +3397,7 @@
         lastCleanupTime = elapsed;
       }
 
-      // 5. Synchronized Dual-Engine Render
+      // 6. Synchronized Dual-Engine Render
       css3dRenderer.render(sceneCSS, camera);
       webglRenderer.render(scene, camera);
     }
