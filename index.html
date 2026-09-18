@@ -3077,10 +3077,12 @@
     }
 
     function updateCrowdCounter() {
-      const totalCount = remotePeers.size + 1;
+      const npcCount = (typeof npcs !== 'undefined') ? npcs.length : 0;
+      const totalCount = remotePeers.size + 1 + npcCount;
       const el = document.getElementById('crowd-count');
       if (el) el.textContent = `CROWD: ${totalCount} / ${CONFIG.maxPeers}`;
     }
+
 
     /* =========================================================================
        8. UI CONTROLS & CUSTOMIZATION SYSTEM
@@ -3232,6 +3234,205 @@
       toast.textContent = msg;
       toast.style.opacity = '1';
       setTimeout(() => { toast.style.opacity = '0'; }, 3000);
+    }
+
+    /* =========================================================================
+       8B. AUTONOMOUS FESTIVAL NPC CROWD SYSTEM (Vibing, Dancing, Walking)
+       ========================================================================= */
+    const npcs = [];
+    const NPC_NAMES = [
+      'ASTRO_KID', 'LIL_GLITCH', 'TRAP_QUEEN', 'YUNG_808', 'METRO_VIBES',
+      'CHROME_DON', 'BELLA_RAVE', 'NEON_SAVAGE', 'CYBER_FLOCKA', 'VORTEX_99',
+      'DRIFT_KING', 'SUB_BASS_BRO', 'HYPEX_01', 'KAY_DRIZZY', 'PLUTO_FAN',
+      'ROLLING_LOUDER', 'CARTI_VAMP', 'SAVAGE_MODE', 'BABY_ROVER', 'STAGE_RUSHER',
+      'FRONT_ROW_VIP', 'PIXEL_CHICK', 'RAVE_WIZARD', 'BBL_DRIZZY', 'ATLANTA_TRAPPER',
+      'MEMPHIS_BOOM', 'TURBO_808', 'FUTURE_HENDRIX', 'GHOST_RIDER', 'LA_FLAME_JR'
+    ];
+
+    const NPC_HANDLES = [
+      'astroworld', 'glitchtrap', 'queen808', 'metroboomin', 'chromevisions',
+      'bellarave', 'neonsav', 'cyberspit', 'vortex99', 'subbassking',
+      'hypex', 'drizzylive', 'pluto4life', 'rollingloud', 'vampmode',
+      '21savagefan', 'babyrover', 'stagediver', 'frontrowvip', 'ravewizard'
+    ];
+
+    const NPC_CHATS = [
+      'DRAKE THE GOAT 🔥',
+      'FUTURE SLID ON THIS BEAT 🦅',
+      'LIL BABY FLOW IS UNREAL 🚀',
+      'ROLLING LOUD 2026 BABYYY 🙌',
+      'TURN UP THE BASS 🔊',
+      'THIS VIBE IS UNMATCHED 🫧',
+      'LETS GOOOOOO 🔥🔥',
+      'BEST FESTIVAL IN 3D ⚡',
+      'OCTANE STAGE ON FIRE',
+      'ENERGY IS 1000%!!'
+    ];
+
+    function getRandomZonePosition(zoneType) {
+      if (zoneType === 'mosh') {
+        // Front stage dance crowd: packed near catwalk & stage lip
+        return new THREE.Vector3(
+          (Math.random() - 0.5) * 26,
+          0,
+          CONFIG.stageZ + 24 + Math.random() * 20
+        );
+      } else if (zoneType === 'lawn') {
+        // Main festival green lawn: roaming across fields
+        return new THREE.Vector3(
+          (Math.random() - 0.5) * 58,
+          0,
+          0 + Math.random() * 42
+        );
+      } else {
+        // Stage wings / Promenade
+        const side = Math.random() > 0.5 ? 1 : -1;
+        return new THREE.Vector3(
+          side * (16 + Math.random() * 12),
+          0,
+          CONFIG.stageZ + 16 + Math.random() * 26
+        );
+      }
+    }
+
+    function spawnNpcCrowd(count = 35) {
+      for (let i = 0; i < count; i++) {
+        const zone = i < 18 ? 'mosh' : (i < 28 ? 'lawn' : 'wings');
+        const startPos = getRandomZonePosition(zone);
+
+        const colorIdx = Math.floor(Math.random() * PALETTES.length);
+        const skinToneIdx = Math.floor(Math.random() * SKIN_TONES.length);
+        const hairColorIdx = Math.floor(Math.random() * HAIR_COLORS.length);
+        const pantsColorIdx = Math.floor(Math.random() * PANTS_PALETTES.length);
+        const hairStyleIdx = Math.floor(Math.random() * 4);
+        const accessories = Math.floor(Math.random() * 8);
+
+        const name = NPC_NAMES[i % NPC_NAMES.length];
+        const handle = NPC_HANDLES[i % NPC_HANDLES.length];
+
+        const rig = createAvatarRig(
+          PALETTES[colorIdx].hex,
+          accessories,
+          SKIN_TONES[skinToneIdx].hex,
+          HAIR_COLORS[hairColorIdx].hex,
+          PANTS_PALETTES[pantsColorIdx].hex,
+          name,
+          handle,
+          hairStyleIdx
+        );
+
+        rig.root.position.copy(startPos);
+
+        // Point generally towards the stage screen
+        const toStage = new THREE.Vector3(0, 0, CONFIG.stageZ).sub(startPos);
+        const rotY = Math.atan2(toStage.x, toStage.z) + (Math.random() - 0.5) * 0.4;
+        rig.root.rotation.y = rotY;
+
+        scene.add(rig.root);
+
+        // Dance emotes: 2: bounce, 3: hype arms, 5: nod, 6: breakdance, 7: wave
+        const initialDance = [2, 3, 5, 7, 6][Math.floor(Math.random() * 5)];
+
+        npcs.push({
+          rig,
+          zone,
+          pos: startPos.clone(),
+          targetPos: startPos.clone(),
+          rotationY: rotY,
+          animState: initialDance,
+          state: 'vibing', // 'vibing' | 'walking'
+          stateTimer: 4.0 + Math.random() * 10.0,
+          chatTimer: 8.0 + Math.random() * 30.0,
+          moveSpeed: 2.2 + Math.random() * 1.8,
+          nickname: name,
+          handle: handle
+        });
+      }
+      updateCrowdCounter();
+      console.log(`[NPC SYSTEM] Spawned ${npcs.length} autonomous festival NPCs.`);
+    }
+
+    function updateNpcCrowd(delta, elapsed) {
+      for (let i = 0; i < npcs.length; i++) {
+        const npc = npcs[i];
+        npc.stateTimer -= delta;
+        npc.chatTimer -= delta;
+
+        // Autonomous Hype Chat Speech Bubbles
+        if (npc.chatTimer <= 0) {
+          npc.chatTimer = 22.0 + Math.random() * 45.0;
+          const phrase = NPC_CHATS[Math.floor(Math.random() * NPC_CHATS.length)];
+          showAvatarSpeech(npc.rig.root, phrase, npc.nickname, 4.0);
+        }
+
+        // State Machine Transition
+        if (npc.stateTimer <= 0) {
+          if (npc.state === 'vibing') {
+            // 40% chance to roam to a new spot, 60% chance to change dance move
+            if (Math.random() < 0.4) {
+              npc.state = 'walking';
+              npc.targetPos = getRandomZonePosition(npc.zone);
+              npc.animState = 1; // Walk
+              npc.stateTimer = 5.0 + Math.random() * 8.0;
+            } else {
+              const dances = [2, 3, 5, 7, 6];
+              npc.animState = dances[Math.floor(Math.random() * dances.length)];
+              npc.stateTimer = 5.0 + Math.random() * 12.0;
+
+              const toStage = new THREE.Vector3(0, 0, CONFIG.stageZ).sub(npc.pos);
+              npc.rotationY = Math.atan2(toStage.x, toStage.z) + (Math.random() - 0.5) * 0.35;
+            }
+          } else {
+            // Finished roaming -> switch back to vibing / dancing
+            npc.state = 'vibing';
+            const dances = [2, 3, 5, 7, 6];
+            npc.animState = dances[Math.floor(Math.random() * dances.length)];
+            npc.stateTimer = 6.0 + Math.random() * 14.0;
+
+            const toStage = new THREE.Vector3(0, 0, CONFIG.stageZ).sub(npc.pos);
+            npc.rotationY = Math.atan2(toStage.x, toStage.z) + (Math.random() - 0.5) * 0.35;
+          }
+        }
+
+        // Behavior Execution
+        let currentSpeed = 0;
+        if (npc.state === 'walking') {
+          const toTarget = new THREE.Vector3().subVectors(npc.targetPos, npc.pos);
+          toTarget.y = 0;
+          const dist = toTarget.length();
+
+          if (dist > 0.6) {
+            toTarget.normalize();
+            npc.pos.addScaledVector(toTarget, npc.moveSpeed * delta);
+
+            const targetRot = Math.atan2(toTarget.x, toTarget.z);
+            let diff = targetRot - npc.rotationY;
+            while (diff < -Math.PI) diff += Math.PI * 2;
+            while (diff > Math.PI) diff -= Math.PI * 2;
+            npc.rotationY += diff * delta * 8.0;
+
+            currentSpeed = npc.moveSpeed;
+            npc.animState = 1;
+          } else {
+            npc.state = 'vibing';
+            npc.animState = [2, 3, 5, 7][Math.floor(Math.random() * 4)];
+            npc.stateTimer = 6.0 + Math.random() * 12.0;
+            const toStage = new THREE.Vector3(0, 0, CONFIG.stageZ).sub(npc.pos);
+            npc.rotationY = Math.atan2(toStage.x, toStage.z);
+          }
+        }
+
+        // Festival Boundary Clamping
+        npc.pos.x = Math.max(-70, Math.min(70, npc.pos.x));
+        npc.pos.z = Math.max(CONFIG.stageZ + 14, Math.min(62, npc.pos.z));
+        npc.pos.y = 0;
+
+        npc.rig.root.position.copy(npc.pos);
+        npc.rig.root.rotation.y = npc.rotationY;
+
+        // Kinematics update with individual phase offset
+        updateAvatarKinematics(npc.rig, npc.animState, currentSpeed, elapsed + i * 0.73, delta);
+      }
     }
 
     /* =========================================================================
@@ -3397,6 +3598,9 @@
         lastCleanupTime = elapsed;
       }
 
+      // 5B. Autonomous NPC Crowd Simulation (Vibing, Dancing, Walking)
+      updateNpcCrowd(delta, elapsed);
+
       // 6. Synchronized Dual-Engine Render
       css3dRenderer.render(sceneCSS, camera);
       webglRenderer.render(scene, camera);
@@ -3410,6 +3614,7 @@
       buildEnvironment();
       buildSpotlightRig();
       sync247Stream();
+      spawnNpcCrowd(35);
     } catch (err) {
       console.error('[CRITICAL INIT ERROR]', err);
     }
