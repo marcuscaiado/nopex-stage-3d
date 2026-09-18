@@ -1,0 +1,24 @@
+{
+  "name": "nopex-stage-3d",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Open-Air 3D Hip-Hop Festival & Live Stage // Synchronized YouTube Concert & Zero-Cost P2P Crowd",
+  "type": "module",
+  "scripts": {
+    "start": "npx serve . -p 5173",
+    "dev": "npx serve . -p 5173"
+  },
+  "keywords": [
+    "threejs",
+    "webgl",
+    "css3d",
+    "p2p",
+    "trystero",
+    "webrtc",
+    "hiphop",
+    "concert",
+    "live-stage"
+  ],
+  "author": "marcuscaiado",
+  "license": "MIT"
+}
