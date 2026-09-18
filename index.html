@@ -544,8 +544,8 @@
           </div>
 
           <!-- Audio Status & Unmute Trigger -->
-          <button id="btn-sound-toggle" class="hud-btn" style="border-color: var(--neon-lime); color: var(--neon-lime);" title="Click to Unmute / Mute Concert Audio">
-            <span id="sound-icon">🔊</span> <span id="sound-text">SOUND ON</span>
+          <button id="btn-sound-toggle" class="hud-btn" style="border-color: var(--neon-pink); color: var(--neon-pink);" title="Click to Unmute / Mute Concert Audio">
+            <span id="sound-icon">🔇</span> <span id="sound-text">CLICK FOR SOUND</span>
           </button>
         </div>
       </div>
@@ -815,13 +815,17 @@
       function initStagePlayer() {
         if (ytPlayer || !window.YT || !window.YT.Player) return;
         try {
-          ytPlayer = new window.YT.Player('stage-youtube-iframe', {
+          ytPlayer = new window.YT.Player(iframe, {
             events: {
               onReady: (event) => {
                 isYtReady = true;
                 console.log('[STAGE] 24/7 YouTube Stream Initialized');
                 try {
                   event.target.playVideo();
+                  if (isAudioUnmuted) {
+                    event.target.unMute();
+                    event.target.setVolume(100);
+                  }
                 } catch(err) {}
               },
               onStateChange: (event) => {
@@ -851,6 +855,19 @@
 
       // 2. WebGL LED Screen Frame, Scaffolding, Speaker Stacks & DJ Deck
       buildStageScaffolding();
+    }
+
+    function sendYouTubeCommand(func, args = []) {
+      const el = document.getElementById('stage-youtube-iframe') || (stageIframeObj && stageIframeObj.element);
+      if (el && el.contentWindow) {
+        try {
+          el.contentWindow.postMessage(JSON.stringify({
+            event: 'command',
+            func: func,
+            args: args
+          }), '*');
+        } catch(e) {}
+      }
     }
 
     function buildStageScaffolding() {
@@ -1738,46 +1755,55 @@
         btnSound.style.color = 'var(--neon-lime)';
       } else {
         icon.textContent = '🔇';
-        text.textContent = 'CLICK TO UNMUTE';
+        text.textContent = 'CLICK FOR SOUND';
         btnSound.style.borderColor = 'var(--neon-pink)';
         btnSound.style.color = 'var(--neon-pink)';
       }
     }
 
-    function ensurePlaybackAndAudio() {
-      if (isYtReady && ytPlayer) {
-        try {
-          ytPlayer.playVideo();
-          if (!isAudioUnmuted) {
+    function setConcertAudio(unmute) {
+      isAudioUnmuted = unmute;
+      if (unmute) {
+        sendYouTubeCommand('unMute');
+        sendYouTubeCommand('setVolume', [100]);
+        sendYouTubeCommand('playVideo');
+        if (ytPlayer && ytPlayer.unMute) {
+          try {
             ytPlayer.unMute();
             ytPlayer.setVolume(100);
-            isAudioUnmuted = true;
-            updateSoundUI();
-            showToast('STAGE AUDIO UNMUTED // 24/7 BROADCAST ON AIR');
-          }
-        } catch(e) {}
+            ytPlayer.playVideo();
+          } catch(e) {}
+        }
+        showToast('🔊 STAGE CONCERT AUDIO UNMUTED // 100% VOLUME');
+      } else {
+        sendYouTubeCommand('mute');
+        if (ytPlayer && ytPlayer.mute) {
+          try { ytPlayer.mute(); } catch(e) {}
+        }
+        showToast('🔇 CONCERT AUDIO MUTED');
+      }
+      updateSoundUI();
+    }
+
+    function ensurePlaybackAndAudio() {
+      if (!isAudioUnmuted) {
+        setConcertAudio(true);
+      } else {
+        sendYouTubeCommand('playVideo');
+        if (ytPlayer && ytPlayer.playVideo) {
+          try { ytPlayer.playVideo(); } catch(e) {}
+        }
       }
     }
 
-    // Auto-unmute on first player movement or click anywhere
+    // Auto-unmute on first user gesture anywhere
     window.addEventListener('click', ensurePlaybackAndAudio);
     window.addEventListener('keydown', ensurePlaybackAndAudio);
     window.addEventListener('pointerdown', ensurePlaybackAndAudio);
 
     btnSound.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (isYtReady && ytPlayer) {
-        if (isAudioUnmuted) {
-          ytPlayer.mute();
-          isAudioUnmuted = false;
-        } else {
-          ytPlayer.unMute();
-          ytPlayer.setVolume(100);
-          ytPlayer.playVideo();
-          isAudioUnmuted = true;
-        }
-        updateSoundUI();
-      }
+      setConcertAudio(!isAudioUnmuted);
     });
 
     // Continuous Playback Watchdog: Guarantees 24/7 stream NEVER pauses (checks every 1.2 seconds)
