@@ -92,14 +92,14 @@
       pointer-events: none;
       opacity: 0;
       transition: opacity 0.4s ease;
-      background: linear-gradient(rgba(18, 16, 26, 0) 50%, rgba(0, 0, 0, 0.35) 50%),
-                  linear-gradient(90deg, rgba(255,0,0,0.04), rgba(0,255,0,0.02), rgba(0,0,255,0.04));
-      background-size: 100% 3px, 6px 100%;
+      background: linear-gradient(rgba(18, 16, 26, 0) 50%, rgba(0, 0, 0, 0.10) 50%),
+                  linear-gradient(90deg, rgba(0,240,255,0.012), rgba(0,0,0,0), rgba(255,0,85,0.012));
+      background-size: 100% 4px, 8px 100%;
     }
 
     #visor-overlay.active {
-      opacity: 1;
-      box-shadow: inset 0 0 100px rgba(0, 240, 255, 0.25);
+      opacity: 0.7;
+      box-shadow: inset 0 0 60px rgba(0, 240, 255, 0.15);
     }
 
     #visor-overlay.active::after {
@@ -476,7 +476,7 @@
     /* Instructions Toast */
     #toast-msg {
       position: absolute;
-      bottom: 24px;
+      bottom: 84px;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(5, 7, 12, 0.88);
@@ -538,7 +538,8 @@
         <div class="concert-controls">
           <!-- 24/7 Live Broadcast Status Indicator -->
           <div class="hud-badge" style="border-color: rgba(255, 0, 85, 0.5); background: rgba(255, 0, 85, 0.15); display: flex; gap: 8px; align-items: center;" title="24/7 Continuous Live Concert Stream">
-            <span style="color: var(--neon-pink); font-weight: 800; animation: pulse-beat 1s infinite;">🔴 24/7 ON AIR:</span>
+            <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--neon-pink); box-shadow: 0 0 8px var(--neon-pink); animation: pulse-beat 0.9s infinite;"></span>
+            <span style="color: var(--neon-pink); font-weight: 800; letter-spacing: 0.5px;">24/7 ON AIR:</span>
             <span id="live-broadcast-label" style="font-weight: 700; color: #fff; letter-spacing: 0.5px;">FUTURE // ROLLING LOUD</span>
           </div>
 
@@ -712,12 +713,85 @@
     /* =========================================================================
        3. YOUTUBE CONCERT STAGE & CSS3D EMBED
        ========================================================================= */
+    // 24/7 Global Live Broadcast Schedule (Synchronized worldwide across all peers by UTC epoch)
+    // 100% Verified, embeddable, full concert trap / rap performances
+    const BROADCAST_SCHEDULE = [
+      { artist: 'DRAKE', title: 'DRAKE // IT\'S ALL A BLUR TOUR MSG [FULL SHOW]', id: 'rJlNyfxACM4', duration: 4200 },
+      { artist: 'LIL BABY', title: 'LIL BABY // ROLLING LOUD [FULL SET]', id: 'CPcpiBSuGUY', duration: 3300 },
+      { artist: 'FUTURE', title: 'FUTURE // LIVE FULL CONCERT', id: 'Qp25s4rqhi4', duration: 3600 },
+      { artist: 'DRAKE', title: 'DRAKE // WIRELESS FESTIVAL FULL SET', id: 'Hp40WN4Ne7A', duration: 3900 },
+      { artist: 'FUTURE', title: 'FUTURE // ROLLING LOUD STADIUM SET', id: 'Ni-nKNR6lSY', duration: 3500 }
+    ];
+
+    const TOTAL_CYCLE_SEC = BROADCAST_SCHEDULE.reduce((acc, c) => acc + c.duration, 0);
+    let fallbackIndex = 0;
     let ytPlayer = null;
     let isYtReady = false;
     let stageIframeObj = null;
-    let currentVideoId = CONFIG.defaultVideoId;
+    let isAudioUnmuted = false;
+
+    function get247BroadcastNow() {
+      const nowSec = Math.floor(Date.now() / 1000);
+      let offset = nowSec % TOTAL_CYCLE_SEC;
+      for (let i = 0; i < BROADCAST_SCHEDULE.length; i++) {
+        const item = BROADCAST_SCHEDULE[i];
+        if (offset < item.duration) {
+          return { item, seekTime: offset, index: i };
+        }
+        offset -= item.duration;
+      }
+      return { item: BROADCAST_SCHEDULE[0], seekTime: 0, index: 0 };
+    }
+
+    const initialBroadcast = get247BroadcastNow();
+    let currentVideoId = initialBroadcast.item.id;
+
+    function loadBroadcastItem(item, seekTime = 0) {
+      const label = document.getElementById('live-broadcast-label');
+      if (label) label.textContent = item.title;
+
+      if (currentVideoId !== item.id) {
+        currentVideoId = item.id;
+        const iframe = document.getElementById('stage-youtube-iframe');
+        if (iframe) {
+          const seekParam = seekTime > 5 ? `&start=${Math.floor(seekTime)}` : '';
+          iframe.src = `https://www.youtube.com/embed/${item.id}?enablejsapi=1&autoplay=1&mute=${isAudioUnmuted ? 0 : 1}&controls=0&disablekb=1&fs=0&modestbranding=1&iv_load_policy=3&loop=1&playlist=${item.id}&playsinline=1&rel=0${seekParam}`;
+        }
+      }
+
+      if (isYtReady && ytPlayer && ytPlayer.seekTo) {
+        const myTime = ytPlayer.getCurrentTime ? ytPlayer.getCurrentTime() : 0;
+        if (seekTime > 0 && Math.abs(myTime - seekTime) > 4.0) {
+          ytPlayer.seekTo(seekTime, true);
+        }
+        ytPlayer.playVideo();
+      }
+    }
+
+    function sync247Stream() {
+      const { item, seekTime } = get247BroadcastNow();
+      loadBroadcastItem(item, seekTime);
+    }
+
+    // Failover Guard: If any video triggers an error, auto-advance to next verified concert
+    function skipToNextBroadcast() {
+      fallbackIndex = (fallbackIndex + 1) % BROADCAST_SCHEDULE.length;
+      const nextItem = BROADCAST_SCHEDULE[fallbackIndex];
+      console.log(`[STAGE AUTO-FAILOVER] Switching to: ${nextItem.title} (${nextItem.id})`);
+      loadBroadcastItem(nextItem, 0);
+    }
+
+    function cycleNextHeadliner() {
+      skipToNextBroadcast();
+    }
 
     function buildConcertScreen() {
+      const broadcastNow = get247BroadcastNow();
+      currentVideoId = broadcastNow.item.id;
+      const initialSeek = broadcastNow.seekTime;
+      const label = document.getElementById('live-broadcast-label');
+      if (label) label.textContent = broadcastNow.item.title;
+
       // 1. Create CSS3D Iframe with continuous autoplay and playlist looping
       const iframe = document.createElement('iframe');
       iframe.className = 'css3d-interactive';
@@ -727,8 +801,8 @@
       iframe.style.border = '0';
       iframe.style.backgroundColor = '#000';
       iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
-      // Autoplay muted first to guarantee immediate browser playback; strip all user controls (controls=0, disablekb=1, fs=0)
-      iframe.src = `https://www.youtube.com/embed/${currentVideoId}?enablejsapi=1&autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&iv_load_policy=3&loop=1&playlist=${currentVideoId}&playsinline=1&rel=0`;
+      const seekParam = initialSeek > 5 ? `&start=${Math.floor(initialSeek)}` : '';
+      iframe.src = `https://www.youtube.com/embed/${currentVideoId}?enablejsapi=1&autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&iv_load_policy=3&loop=1&playlist=${currentVideoId}&playsinline=1&rel=0${seekParam}`;
 
       // CSS3D Scale Factor: Screen Dimensions / 1280
       const scaleFactor = CONFIG.stageWidth / 1280;
@@ -738,33 +812,42 @@
       sceneCSS.add(stageIframeObj);
 
       // Initialize YouTube API Client
-      window.onYouTubeIframeAPIReady = () => {
-        ytPlayer = new window.YT.Player('stage-youtube-iframe', {
-          events: {
-            onReady: (event) => {
-              isYtReady = true;
-              console.log('[STAGE] 24/7 YouTube Stream Initialized');
-              try {
-                event.target.playVideo();
-              } catch(err) {}
-            },
-            onStateChange: (event) => {
-              // 24/7 Zero-Pause Enforcement: If video pauses or stops, resume or cycle immediately!
-              if (window.YT) {
-                if (event.data === window.YT.PlayerState.ENDED) {
-                  cycleNextHeadliner();
-                } else if (event.data === window.YT.PlayerState.PAUSED) {
+      function initStagePlayer() {
+        if (ytPlayer || !window.YT || !window.YT.Player) return;
+        try {
+          ytPlayer = new window.YT.Player('stage-youtube-iframe', {
+            events: {
+              onReady: (event) => {
+                isYtReady = true;
+                console.log('[STAGE] 24/7 YouTube Stream Initialized');
+                try {
                   event.target.playVideo();
+                } catch(err) {}
+              },
+              onStateChange: (event) => {
+                if (window.YT) {
+                  if (event.data === window.YT.PlayerState.ENDED) {
+                    cycleNextHeadliner();
+                  } else if (event.data === window.YT.PlayerState.PAUSED) {
+                    event.target.playVideo();
+                  }
                 }
+              },
+              onError: (event) => {
+                console.warn('[STAGE WATCHDOG] Video unavailable or embed blocked (Code ' + event.data + '). Auto-skipping!');
+                skipToNextBroadcast();
               }
-            },
-            onError: (event) => {
-              console.warn('[STAGE WATCHDOG] Video unavailable or embed blocked (Code ' + event.data + '). Auto-skipping to next concert!');
-              skipToNextBroadcast();
             }
-          }
-        });
-      };
+          });
+        } catch(e) {
+          console.warn('[STAGE] Player creation deferred:', e);
+        }
+      }
+
+      window.onYouTubeIframeAPIReady = initStagePlayer;
+      if (window.YT && window.YT.Player) {
+        initStagePlayer();
+      }
 
       // 2. WebGL LED Screen Frame, Scaffolding, Speaker Stacks & DJ Deck
       buildStageScaffolding();
@@ -1593,7 +1676,6 @@
        8. UI CONTROLS & CUSTOMIZATION SYSTEM
        ========================================================================= */
     const customizerPanel = document.getElementById('customizer-panel');
-    const setlistPanel = document.getElementById('setlist-panel');
     const visorOverlay = document.getElementById('visor-overlay');
 
     const paletteContainer = document.getElementById('palette-picker');
@@ -1643,7 +1725,6 @@
     document.getElementById('close-customizer').addEventListener('click', () => customizerPanel.classList.remove('visible'));
 
     // Audio State & Continuous Playback System
-    let isAudioUnmuted = false;
     const btnSound = document.getElementById('btn-sound-toggle');
 
     function updateSoundUI() {
@@ -1699,70 +1780,6 @@
       }
     });
 
-    // 24/7 Global Live Broadcast Schedule (Synchronized worldwide across all peers by UTC epoch)
-    // 100% Verified, embeddable, full concert trap / rap performances
-    const BROADCAST_SCHEDULE = [
-      { artist: 'DRAKE', title: 'DRAKE // IT\'S ALL A BLUR TOUR MSG [FULL SHOW]', id: 'rJlNyfxACM4', duration: 4200 },
-      { artist: 'LIL BABY', title: 'LIL BABY // ROLLING LOUD [FULL SET]', id: 'CPcpiBSuGUY', duration: 3300 },
-      { artist: 'FUTURE', title: 'FUTURE // LIVE FULL CONCERT', id: 'Qp25s4rqhi4', duration: 3600 },
-      { artist: 'DRAKE', title: 'DRAKE // WIRELESS FESTIVAL FULL SET', id: 'Hp40WN4Ne7A', duration: 3900 },
-      { artist: 'FUTURE', title: 'FUTURE // ROLLING LOUD STADIUM SET', id: 'Ni-nKNR6lSY', duration: 3500 }
-    ];
-
-    const TOTAL_CYCLE_SEC = BROADCAST_SCHEDULE.reduce((acc, c) => acc + c.duration, 0);
-    let fallbackIndex = 0;
-
-    function get247BroadcastNow() {
-      const nowSec = Math.floor(Date.now() / 1000);
-      let offset = nowSec % TOTAL_CYCLE_SEC;
-      for (let i = 0; i < BROADCAST_SCHEDULE.length; i++) {
-        const item = BROADCAST_SCHEDULE[i];
-        if (offset < item.duration) {
-          return { item, seekTime: offset, index: i };
-        }
-        offset -= item.duration;
-      }
-      return { item: BROADCAST_SCHEDULE[0], seekTime: 0, index: 0 };
-    }
-
-    function sync247Stream() {
-      const { item, seekTime } = get247BroadcastNow();
-      loadBroadcastItem(item, seekTime);
-    }
-
-    function loadBroadcastItem(item, seekTime = 0) {
-      const label = document.getElementById('live-broadcast-label');
-      if (label) label.textContent = item.title;
-
-      if (currentVideoId !== item.id) {
-        currentVideoId = item.id;
-        const iframe = document.getElementById('stage-youtube-iframe');
-        if (iframe) {
-          iframe.src = `https://www.youtube.com/embed/${item.id}?enablejsapi=1&autoplay=1&mute=${isAudioUnmuted ? 0 : 1}&controls=0&disablekb=1&fs=0&modestbranding=1&iv_load_policy=3&loop=1&playlist=${item.id}&playsinline=1&rel=0`;
-        }
-      }
-
-      if (isYtReady && ytPlayer && ytPlayer.seekTo) {
-        const myTime = ytPlayer.getCurrentTime ? ytPlayer.getCurrentTime() : 0;
-        if (seekTime > 0 && Math.abs(myTime - seekTime) > 4.0) {
-          ytPlayer.seekTo(seekTime, true);
-        }
-        ytPlayer.playVideo();
-      }
-    }
-
-    // Failover Guard: If any video triggers an error, auto-advance to next verified concert
-    function skipToNextBroadcast() {
-      fallbackIndex = (fallbackIndex + 1) % BROADCAST_SCHEDULE.length;
-      const nextItem = BROADCAST_SCHEDULE[fallbackIndex];
-      console.log(`[STAGE AUTO-FAILOVER] Switching to: ${nextItem.title} (${nextItem.id})`);
-      loadBroadcastItem(nextItem, 0);
-    }
-
-    function cycleNextHeadliner() {
-      skipToNextBroadcast();
-    }
-
     // Continuous Playback Watchdog: Guarantees 24/7 stream NEVER pauses (checks every 1.2 seconds)
     setInterval(() => {
       if (isYtReady && ytPlayer && ytPlayer.getPlayerState) {
@@ -1783,10 +1800,13 @@
       });
     });
 
-    document.getElementById('btn-sync').addEventListener('click', () => {
-      ensurePlaybackAndAudio();
-      showToast('STAGE AUDIO & SYNC TRIGGERED');
-    });
+    const btnSync = document.getElementById('btn-sync');
+    if (btnSync) {
+      btnSync.addEventListener('click', () => {
+        ensurePlaybackAndAudio();
+        showToast('STAGE AUDIO & SYNC TRIGGERED');
+      });
+    }
 
     // Continuous Playback Watchdog: Guarantees video is ALWAYS playing
     setInterval(() => {
@@ -1964,10 +1984,21 @@
     /* =========================================================================
        10. BOOTSTRAP SYSTEM
        ========================================================================= */
-    buildConcertScreen();
-    buildEnvironment();
-    buildSpotlightRig();
-    initNetworking();
+    try {
+      buildConcertScreen();
+      buildEnvironment();
+      buildSpotlightRig();
+      sync247Stream();
+    } catch (err) {
+      console.error('[CRITICAL INIT ERROR]', err);
+    }
+
+    try {
+      initNetworking();
+    } catch (err) {
+      console.warn('[NETWORKING INIT]', err);
+    }
+
     animate();
 
     console.log('[SYSTEM] Open-Air 3D Hip-Hop Festival & Live Stage Engine Online.');
