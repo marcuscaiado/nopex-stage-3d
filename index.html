@@ -534,8 +534,24 @@
         </div>
 
         <div class="concert-controls">
+          <!-- Quick Headliner Concert Selectors -->
+          <button class="hud-btn headliner-btn active" data-vid="wX59c4s-c-4" title="Play Future Live at Rolling Loud">
+            <span>🔥</span> FUTURE
+          </button>
+          <button class="hud-btn headliner-btn" data-vid="rJlNyfxACM4" title="Play Drake It's All A Blur Tour Live">
+            <span>🦉</span> DRAKE
+          </button>
+          <button class="hud-btn headliner-btn" data-vid="CPcpiBSuGUY" title="Play Lil Baby Live at Rolling Loud">
+            <span>💎</span> LIL BABY
+          </button>
+
+          <!-- Audio Status & Unmute Trigger -->
+          <button id="btn-sound-toggle" class="hud-btn" style="border-color: var(--neon-lime); color: var(--neon-lime);" title="Click to Unmute / Mute Concert Audio">
+            <span id="sound-icon">🔊</span> <span id="sound-text">SOUND ON</span>
+          </button>
+
           <button id="btn-sync" class="hud-btn" title="Sync YouTube Live Stream with Host">
-            <span>⚡</span> SYNC STAGE
+            <span>⚡</span> SYNC
           </button>
           <button id="btn-setlist" class="hud-btn" title="Select Concert Setlist / Video">
             <span>🎬</span> SETLIST
@@ -547,24 +563,38 @@
     <!-- Setlist Modal -->
     <div id="setlist-panel">
       <div class="panel-header">
-        <span>CONCERT SETLIST</span>
+        <span>MODERN RAP // TRAP SETLIST</span>
         <button id="close-setlist" class="hud-btn" style="padding: 2px 8px;">✕</button>
       </div>
-      <div class="setlist-item active" data-vid="V-_O7nl0Ii0">
-        <div class="setlist-title">Playboi Carti - Rolling Loud Live</div>
-        <div class="setlist-artist">FULL CONCERT PRO-SHOT (RAGE / TRAP)</div>
+
+      <div class="setlist-item active" data-vid="wX59c4s-c-4">
+        <div class="setlist-title">Future - LIVE @ Rolling Loud 2024</div>
+        <div class="setlist-artist">FULL CONCERT PRO-SHOT // TRAP HEADLINER</div>
       </div>
-      <div class="setlist-item" data-vid="2G_fZfZvW_Y">
-        <div class="setlist-title">Travis Scott - Circus Maximus Tour</div>
-        <div class="setlist-artist">STADIUM LIVE EXPERIENCE</div>
+      <div class="setlist-item" data-vid="rJlNyfxACM4">
+        <div class="setlist-title">Drake - It's All A Blur Tour Live</div>
+        <div class="setlist-artist">FULL CONCERT STADIUM TOUR EXPERIENCE</div>
       </div>
-      <div class="setlist-item" data-vid="b8m9zhNA4Ao">
-        <div class="setlist-title">Future & Metro Boomin - Live Set</div>
-        <div class="setlist-artist">WE DON'T TRUST YOU ARENA</div>
+      <div class="setlist-item" data-vid="CPcpiBSuGUY">
+        <div class="setlist-title">Lil Baby - LIVE @ Rolling Loud 2024</div>
+        <div class="setlist-artist">FULL CONCERT PRO-SHOT // ATLANTA TRAP</div>
       </div>
+      <div class="setlist-item" data-vid="Hp40WN4Ne7A">
+        <div class="setlist-title">Drake - Wireless Festival London</div>
+        <div class="setlist-artist">FULL HEADLINER SET PRO-SHOT</div>
+      </div>
+      <div class="setlist-item" data-vid="kY67Z3wD8q8">
+        <div class="setlist-title">Future - Rolling Loud Miami 2022</div>
+        <div class="setlist-artist">FULL CONCERT SET // CLASSIC ANTHEMS</div>
+      </div>
+      <div class="setlist-item" data-vid="Vd0-u1-4t9k">
+        <div class="setlist-title">Lil Baby - Rolling Loud Miami Set</div>
+        <div class="setlist-artist">LIVE STADIUM PERFORMANCE</div>
+      </div>
+
       <div class="panel-section-title" style="margin-top: 6px;">Custom YouTube Video ID</div>
       <div class="custom-url-row">
-        <input type="text" id="custom-video-id" class="custom-input" placeholder="e.g. V-_O7nl0Ii0" />
+        <input type="text" id="custom-video-id" class="custom-input" placeholder="e.g. wX59c4s-c-4" />
         <button id="btn-load-custom" class="hud-btn">LOAD</button>
       </div>
     </div>
@@ -648,7 +678,7 @@
     const CONFIG = {
       appId: 'nopex-hiphop-fest-2026',
       roomId: window.location.hash.replace('#', '') || 'main-stage',
-      defaultVideoId: 'V-_O7nl0Ii0', // Playboi Carti Rolling Loud pro-shot
+      defaultVideoId: 'wX59c4s-c-4', // Future - LIVE @ Rolling Loud 2024 Full Set
       bpm: 135,
       beatInterval: 60 / 135, // ~0.444s per beat
       stageWidth: 38,
@@ -737,7 +767,7 @@
     let currentVideoId = CONFIG.defaultVideoId;
 
     function buildConcertScreen() {
-      // 1. Create CSS3D Iframe
+      // 1. Create CSS3D Iframe with continuous autoplay and playlist looping
       const iframe = document.createElement('iframe');
       iframe.className = 'css3d-interactive';
       iframe.id = 'stage-youtube-iframe';
@@ -745,8 +775,9 @@
       iframe.style.height = '720px';
       iframe.style.border = '0';
       iframe.style.backgroundColor = '#000';
-      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-      iframe.src = `https://www.youtube-nocookie.com/embed/${currentVideoId}?enablejsapi=1&autoplay=1&mute=0&controls=1&rel=0&playsinline=1&origin=${encodeURIComponent(window.location.origin)}`;
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      // Autoplay muted first to guarantee immediate browser playback without blockage
+      iframe.src = `https://www.youtube-nocookie.com/embed/${currentVideoId}?enablejsapi=1&autoplay=1&mute=1&controls=1&loop=1&playlist=${currentVideoId}&playsinline=1&rel=0&origin=${encodeURIComponent(window.location.origin)}`;
 
       // CSS3D Scale Factor: Screen Dimensions / 1280
       const scaleFactor = CONFIG.stageWidth / 1280;
@@ -759,9 +790,18 @@
       window.onYouTubeIframeAPIReady = () => {
         ytPlayer = new window.YT.Player('stage-youtube-iframe', {
           events: {
-            onReady: () => {
+            onReady: (event) => {
               isYtReady = true;
               console.log('[STAGE] YouTube Player API Initialized');
+              try {
+                event.target.playVideo();
+              } catch(err) {}
+            },
+            onStateChange: (event) => {
+              // If video ends, seamlessly cycle to next headliner in queue
+              if (window.YT && event.data === window.YT.PlayerState.ENDED) {
+                cycleNextHeadliner();
+              }
             }
           }
         });
@@ -1648,25 +1688,107 @@
     });
     document.getElementById('close-setlist').addEventListener('click', () => setlistPanel.classList.remove('visible'));
 
+    // Audio State & Continuous Playback System
+    let isAudioUnmuted = false;
+    const btnSound = document.getElementById('btn-sound-toggle');
+
+    function updateSoundUI() {
+      if (!btnSound) return;
+      const icon = document.getElementById('sound-icon');
+      const text = document.getElementById('sound-text');
+      if (isAudioUnmuted) {
+        icon.textContent = '🔊';
+        text.textContent = 'SOUND ON';
+        btnSound.style.borderColor = 'var(--neon-lime)';
+        btnSound.style.color = 'var(--neon-lime)';
+      } else {
+        icon.textContent = '🔇';
+        text.textContent = 'CLICK TO UNMUTE';
+        btnSound.style.borderColor = 'var(--neon-pink)';
+        btnSound.style.color = 'var(--neon-pink)';
+      }
+    }
+
+    function ensurePlaybackAndAudio() {
+      if (isYtReady && ytPlayer) {
+        try {
+          ytPlayer.playVideo();
+          if (!isAudioUnmuted) {
+            ytPlayer.unMute();
+            ytPlayer.setVolume(100);
+            isAudioUnmuted = true;
+            updateSoundUI();
+            showToast('CONCERT AUDIO LIVE & UNMUTED');
+          }
+        } catch(e) {}
+      }
+    }
+
+    // Auto-unmute on first player movement or click
+    window.addEventListener('click', ensurePlaybackAndAudio);
+    window.addEventListener('keydown', ensurePlaybackAndAudio);
+    window.addEventListener('pointerdown', ensurePlaybackAndAudio);
+
+    btnSound.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (isYtReady && ytPlayer) {
+        if (isAudioUnmuted) {
+          ytPlayer.mute();
+          isAudioUnmuted = false;
+        } else {
+          ytPlayer.unMute();
+          ytPlayer.setVolume(100);
+          ytPlayer.playVideo();
+          isAudioUnmuted = true;
+        }
+        updateSoundUI();
+      }
+    });
+
+    const HEADLINER_LIST = ['wX59c4s-c-4', 'rJlNyfxACM4', 'CPcpiBSuGUY'];
+    function cycleNextHeadliner() {
+      const idx = HEADLINER_LIST.indexOf(currentVideoId);
+      const nextIdx = (idx + 1) % HEADLINER_LIST.length;
+      switchVideo(HEADLINER_LIST[nextIdx], true);
+    }
+
     function switchVideo(vid, broadcast = true) {
       currentVideoId = vid;
       const iframe = document.getElementById('stage-youtube-iframe');
       if (iframe) {
-        iframe.src = `https://www.youtube-nocookie.com/embed/${vid}?enablejsapi=1&autoplay=1&mute=0&controls=1&rel=0&playsinline=1&origin=${encodeURIComponent(window.location.origin)}`;
+        iframe.src = `https://www.youtube-nocookie.com/embed/${vid}?enablejsapi=1&autoplay=1&mute=${isAudioUnmuted ? 0 : 1}&controls=1&loop=1&playlist=${vid}&playsinline=1&rel=0&origin=${encodeURIComponent(window.location.origin)}`;
       }
+      // Update Setlist Active State
       document.querySelectorAll('.setlist-item').forEach(item => {
         item.classList.toggle('active', item.dataset.vid === vid);
+      });
+      // Update Topbar Headliner Pills
+      document.querySelectorAll('.headliner-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.vid === vid);
       });
 
       if (broadcast && sendSyncAction) {
         sendSyncAction({ vid: vid, time: 0, epoch: Date.now() });
       }
+
+      setTimeout(ensurePlaybackAndAudio, 600);
     }
+
+    // Quick Headliner Buttons (Future / Drake / Lil Baby)
+    document.querySelectorAll('.headliner-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const vid = btn.dataset.vid;
+        switchVideo(vid, true);
+        ensurePlaybackAndAudio();
+      });
+    });
 
     document.querySelectorAll('.setlist-item').forEach(item => {
       item.addEventListener('click', () => {
         switchVideo(item.dataset.vid, true);
         setlistPanel.classList.remove('visible');
+        ensurePlaybackAndAudio();
       });
     });
 
@@ -1675,6 +1797,7 @@
       if (vid) {
         switchVideo(vid, true);
         setlistPanel.classList.remove('visible');
+        ensurePlaybackAndAudio();
       }
     });
 
@@ -1685,11 +1808,20 @@
     });
 
     document.getElementById('btn-sync').addEventListener('click', () => {
-      if (isYtReady && ytPlayer && ytPlayer.playVideo) {
-        ytPlayer.playVideo();
-      }
+      ensurePlaybackAndAudio();
       showToast('STAGE AUDIO & SYNC TRIGGERED');
     });
+
+    // Continuous Playback Watchdog: Guarantees video is ALWAYS playing
+    setInterval(() => {
+      if (isYtReady && ytPlayer && ytPlayer.getPlayerState) {
+        const state = ytPlayer.getPlayerState();
+        // 2: paused, -1: unstarted, 0: ended, 5: video cued
+        if (state === 2 || state === -1 || state === 0 || state === 5) {
+          ytPlayer.playVideo();
+        }
+      }
+    }, 2500);
 
     function showToast(msg) {
       const toast = document.getElementById('toast-msg');
