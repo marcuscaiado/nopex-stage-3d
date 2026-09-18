@@ -971,8 +971,12 @@
           <span class="keycap-k">Y</span>
           <span class="keycap-label">breakdance</span>
         </div>
-        <div class="dock-pill active" id="pill-space" data-key="Space" title="Speak / In-Game Chat [SPACE]">
+        <div class="dock-pill active" id="pill-space" data-key="Space" title="Jump Avatar [SPACE]">
           <span class="keycap-k" style="padding: 1px 12px;">SPACE</span>
+          <span class="keycap-label">jump</span>
+        </div>
+        <div class="dock-pill" id="pill-enter" data-key="Enter" title="Speak / In-Game Chat [ENTER]">
+          <span class="keycap-k" style="padding: 1px 8px;">ENTER</span>
           <span class="keycap-label">speak</span>
         </div>
         <div class="dock-pill" id="pill-c" data-key="KeyC" title="Spawn Floating Party Bubbles [C]">
@@ -1041,8 +1045,8 @@
       </div>
       <div class="help-grid">
         <div class="help-item"><span>W, A, S, D / Arrows</span><span style="color: var(--neon-cyan);">Move Avatar</span></div>
-        <div class="help-item"><span>SHIFT</span><span style="color: var(--neon-cyan);">Sprint</span></div>
-        <div class="help-item"><span>SPACE</span><span style="color: var(--neon-cyan);">Speak / Chat Bubble</span></div>
+        <div class="help-item"><span>SPACE</span><span style="color: var(--neon-lime);">Jump Avatar</span></div>
+        <div class="help-item"><span>ENTER</span><span style="color: var(--neon-cyan);">Speak / Chat Bubble</span></div>
         <div class="help-item"><span>B</span><span style="color: var(--neon-lime);">Bounce / Jetpack Boost</span></div>
         <div class="help-item"><span>C</span><span style="color: var(--neon-cyan);">Emit Bubbles</span></div>
         <div class="help-item"><span>N</span><span style="color: var(--neon-pink);">Foam / Smoke Cannon</span></div>
@@ -2725,6 +2729,21 @@
       }
     }
 
+    function triggerJump() {
+      if (player.isGrounded) {
+        player.velocity.y = CONFIG.jumpVelocity;
+        player.isGrounded = false;
+        player.animState = 4;
+        showToast('🦘 JUMP ACTION!');
+        const pill = document.getElementById('pill-space');
+        if (pill) {
+          pill.classList.add('active');
+          setTimeout(() => pill.classList.remove('active'), 250);
+        }
+        broadcastPlayerTransform();
+      }
+    }
+
     function triggerJetpack() {
       player.velocity.y = 17.0;
       player.isGrounded = false;
@@ -2852,7 +2871,8 @@
       else if (e.code === 'KeyG') { toggleSunglasses(); }
       else if (e.code === 'KeyH' || e.code === 'Slash') { toggleHelpModal(); }
       else if (e.code === 'Tab') { e.preventDefault(); toggleCustomizer(); }
-      else if (e.code === 'Space') { e.preventDefault(); openChat(); }
+      else if (e.code === 'Space') { e.preventDefault(); triggerJump(); }
+      else if (e.code === 'Enter') { e.preventDefault(); openChat(); }
       else if (e.code === 'Digit7') { cycleHairColor(-1); }
       else if (e.code === 'Digit8') { cycleHairColor(1); }
       else if (e.code === 'Digit9') { cycleSkinTone(-1); }
@@ -2905,8 +2925,25 @@
     });
 
     window.addEventListener('wheel', (e) => {
-      cameraRig.targetDistance += e.deltaY * 0.005;
-      cameraRig.targetDistance = Math.max(2.8, Math.min(14.0, cameraRig.targetDistance));
+      cameraRig.targetDistance += e.deltaY * 0.006;
+      cameraRig.targetDistance = Math.max(0.0, Math.min(15.0, cameraRig.targetDistance));
+
+      // Auto First-Person on Full Zoom In
+      if (cameraRig.targetDistance <= 0.8) {
+        if (currentCamModeIdx !== 1) {
+          currentCamModeIdx = 1;
+          showToast('👁️ FIRST-PERSON VIEW [FULL ZOOM]');
+          const pill = document.getElementById('pill-t');
+          if (pill) {
+            pill.classList.add('active');
+            setTimeout(() => pill.classList.remove('active'), 250);
+          }
+        }
+      } else if (cameraRig.targetDistance > 1.2 && currentCamModeIdx === 1) {
+        // Zooming out switches back to 3rd-person chase
+        currentCamModeIdx = 0;
+        showToast('🎥 3RD-PERSON CHASE VIEW');
+      }
     }, { passive: true });
 
     function setEmote(stateId) {
@@ -2937,7 +2974,8 @@
     document.getElementById('pill-t')?.addEventListener('click', (e) => { e.stopPropagation(); cycleCameraMode(); });
     document.getElementById('pill-f')?.addEventListener('click', (e) => { e.stopPropagation(); takePhotoSnapshot(); });
     document.getElementById('pill-y')?.addEventListener('click', (e) => { e.stopPropagation(); triggerBreakdance(); });
-    document.getElementById('pill-space')?.addEventListener('click', (e) => { e.stopPropagation(); openChat(); });
+    document.getElementById('pill-space')?.addEventListener('click', (e) => { e.stopPropagation(); triggerJump(); });
+    document.getElementById('pill-enter')?.addEventListener('click', (e) => { e.stopPropagation(); openChat(); });
     document.getElementById('pill-c')?.addEventListener('click', (e) => { e.stopPropagation(); triggerBubbles(); });
     document.getElementById('pill-v')?.addEventListener('click', (e) => { e.stopPropagation(); triggerWave(); });
     document.getElementById('pill-b')?.addEventListener('click', (e) => { e.stopPropagation(); triggerJetpack(); });
@@ -3452,16 +3490,8 @@
       for (let i = 0; i < npcs.length; i++) {
         const npc = npcs[i];
         npc.stateTimer -= delta;
-        npc.chatTimer -= delta;
 
-        // Autonomous Hype Chat Speech Bubbles
-        if (npc.chatTimer <= 0) {
-          npc.chatTimer = 22.0 + Math.random() * 45.0;
-          const phrase = NPC_CHATS[Math.floor(Math.random() * NPC_CHATS.length)];
-          showAvatarSpeech(npc.rig.root, phrase, npc.nickname, 4.0);
-        }
-
-        // State Machine Transition
+        // State Machine Transition (Only Movement & Dance, No Speech)
         if (npc.stateTimer <= 0) {
           if (npc.state === 'vibing') {
             // 40% chance to roam to a new spot, 60% chance to change dance move
@@ -3640,7 +3670,12 @@
       updateFoam(delta);
       updateSparks(delta);
 
-      // 4. Multi-View Camera Controller
+      // 4. Multi-View Camera Controller & First-Person Avatar Visibility
+      if (player.rig && player.rig.root) {
+        // Hide avatar mesh in 1st-person so it never obstructs screen
+        player.rig.root.visible = (currentCamModeIdx !== 1);
+      }
+
       if (currentCamModeIdx === 0) {
         // Mode 0: 3rd-Person Chase Follow
         cameraRig.distance += (cameraRig.targetDistance - cameraRig.distance) * delta * 10.0;
@@ -3657,7 +3692,7 @@
         camera.lookAt(camTargetPos);
       } else if (currentCamModeIdx === 1) {
         // Mode 1: 1st-Person POV
-        const eyePos = new THREE.Vector3(player.position.x, player.position.y + 2.0, player.position.z);
+        const eyePos = new THREE.Vector3(player.position.x, player.position.y + 1.85, player.position.z);
         camera.position.copy(eyePos);
         const lookDir = new THREE.Vector3(
           -Math.sin(cameraRig.yaw) * Math.cos(cameraRig.pitch),
@@ -3665,6 +3700,8 @@
           -Math.cos(cameraRig.yaw) * Math.cos(cameraRig.pitch)
         );
         camera.lookAt(eyePos.clone().add(lookDir));
+        // Align avatar heading with camera yaw
+        player.rotationY = cameraRig.yaw;
       } else if (currentCamModeIdx === 2) {
         // Mode 2: VIP Front Stage (facing the YouTube screen)
         const vipPos = new THREE.Vector3(0, 3.2, CONFIG.stageZ + 36);
