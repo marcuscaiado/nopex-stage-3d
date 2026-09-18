@@ -683,9 +683,10 @@
     const glCanvas = document.getElementById('webgl-canvas');
     const cssContainer = document.getElementById('css3d-container');
 
-    // WebGL Scene & Fog
+    // WebGL Scene, Atmosphere & Sky
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x050508, 0.016);
+    scene.background = new THREE.Color(0x121926);
+    scene.fog = new THREE.FogExp2(0x121926, 0.0038);
 
     // CSS3D Scene
     const sceneCSS = new THREE.Scene();
@@ -880,33 +881,42 @@
     /* =========================================================================
        4. ATMOSPHERE, GROUND & CONCERT SPOTLIGHT RIG
        ========================================================================= */
-    // Procedural Endless Asphalt/Mud Ground Texture via Canvas
-    function createTarmacTexture() {
+    // Procedural Lush Festival Lawn / Green Grass (Gramado) Texture via Canvas
+    function createGrassTexture() {
       const cvs = document.createElement('canvas');
       cvs.width = 512;
       cvs.height = 512;
       const ctx = cvs.getContext('2d');
 
-      ctx.fillStyle = '#0a0a0d';
+      // Base vibrant festival green turf
+      ctx.fillStyle = '#26541f';
       ctx.fillRect(0, 0, 512, 512);
 
-      // Noise grains & asphalt specs
-      for (let i = 0; i < 40000; i++) {
-        const x = Math.random() * 512;
-        const y = Math.random() * 512;
-        const lum = Math.floor(Math.random() * 32) + 8;
-        ctx.fillStyle = `rgb(${lum},${lum},${lum + 4})`;
-        ctx.fillRect(x, y, 1.5, 1.5);
+      // Alternating lawn stripe mower patterns (stadium / festival arena look)
+      for (let y = 0; y < 512; y += 64) {
+        ctx.fillStyle = (y / 64) % 2 === 0 ? 'rgba(44, 98, 36, 0.42)' : 'rgba(30, 72, 24, 0.42)';
+        ctx.fillRect(0, y, 512, 64);
       }
 
-      // Brutalist wet puddles / mud patches
-      for (let i = 0; i < 16; i++) {
+      // Fine grass blades and color micro-variation
+      for (let i = 0; i < 55000; i++) {
+        const x = Math.random() * 512;
+        const y = Math.random() * 512;
+        const r = Math.floor(Math.random() * 30) + 30;
+        const g = Math.floor(Math.random() * 80) + 110;
+        const b = Math.floor(Math.random() * 30) + 20;
+        ctx.fillStyle = `rgb(${r},${g},${b})`;
+        ctx.fillRect(x, y, 2, 2.5);
+      }
+
+      // Natural soft organic soil & grass patches
+      for (let i = 0; i < 24; i++) {
         const cx = Math.random() * 512;
         const cy = Math.random() * 512;
-        const rad = Math.random() * 40 + 20;
+        const rad = Math.random() * 60 + 25;
         const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
-        grad.addColorStop(0, 'rgba(5, 5, 8, 0.85)');
-        grad.addColorStop(1, 'rgba(10, 10, 13, 0)');
+        grad.addColorStop(0, 'rgba(65, 140, 48, 0.35)');
+        grad.addColorStop(1, 'rgba(30, 70, 22, 0)');
         ctx.fillStyle = grad;
         ctx.beginPath();
         ctx.arc(cx, cy, rad, 0, Math.PI * 2);
@@ -916,17 +926,17 @@
       const texture = new THREE.CanvasTexture(cvs);
       texture.wrapS = THREE.RepeatWrapping;
       texture.wrapT = THREE.RepeatWrapping;
-      texture.repeat.set(40, 40);
+      texture.repeat.set(50, 50);
       return texture;
     }
 
     function buildEnvironment() {
-      // Ground Plane
+      // Big Gramado Green (Lush Festival Lawn)
       const groundGeo = new THREE.PlaneGeometry(CONFIG.groundSize, CONFIG.groundSize);
       const groundMat = new THREE.MeshStandardMaterial({
-        map: createTarmacTexture(),
-        roughness: 0.85,
-        metalness: 0.25
+        map: createGrassTexture(),
+        roughness: 0.78,
+        metalness: 0.05
       });
       const ground = new THREE.Mesh(groundGeo, groundMat);
       ground.rotation.x = -Math.PI / 2;
@@ -934,26 +944,100 @@
       ground.receiveShadow = true;
       scene.add(ground);
 
-      // Perimeter Fences / Barriers
-      const fenceMat = new THREE.MeshBasicMaterial({ color: 0x181a24, wireframe: true });
-      const fenceGeo = new THREE.BoxGeometry(160, 4, 1);
+      // Paved Front Stage Standing Promenade / Walkway
+      const paveGeo = new THREE.BoxGeometry(70, 0.1, 14);
+      const paveMat = new THREE.MeshStandardMaterial({
+        color: 0x1c1e26,
+        roughness: 0.7,
+        metalness: 0.2
+      });
+      const frontWalkway = new THREE.Mesh(paveGeo, paveMat);
+      frontWalkway.position.set(0, 0.05, CONFIG.stageZ + 25);
+      frontWalkway.receiveShadow = true;
+      scene.add(frontWalkway);
+
+      // Perimeter Festival Barriers (Brutalist Crowd Control Rails)
+      const fenceMat = new THREE.MeshStandardMaterial({ color: 0x4a4d5e, metalness: 0.8, roughness: 0.3 });
+      const fenceGeo = new THREE.BoxGeometry(160, 2.4, 0.3);
 
       const northFence = new THREE.Mesh(fenceGeo, fenceMat);
-      northFence.position.set(0, 2, CONFIG.stageZ - 6);
+      northFence.position.set(0, 1.2, CONFIG.stageZ - 6);
       const southFence = new THREE.Mesh(fenceGeo, fenceMat);
-      southFence.position.set(0, 2, 70);
+      southFence.position.set(0, 1.2, 70);
 
-      const sideFenceGeo = new THREE.BoxGeometry(1, 4, 130);
+      const sideFenceGeo = new THREE.BoxGeometry(0.3, 2.4, 130);
       const westFence = new THREE.Mesh(sideFenceGeo, fenceMat);
-      westFence.position.set(-80, 2, 10);
+      westFence.position.set(-80, 1.2, 10);
       const eastFence = new THREE.Mesh(sideFenceGeo, fenceMat);
-      eastFence.position.set(80, 2, 10);
+      eastFence.position.set(80, 1.2, 10);
 
       scene.add(northFence, southFence, westFence, eastFence);
 
-      // Ambient Fill
-      const ambientLight = new THREE.AmbientLight(0x0a0c16, 1.2);
-      scene.add(ambientLight);
+      // 1. Natural Open-Air Atmosphere & Hemisphere Sky Light
+      // Sky blue downlight + grass green bounce light for crisp, natural visibility
+      const hemiLight = new THREE.HemisphereLight(0x8cb6e8, 0x3d6e2e, 1.6);
+      scene.add(hemiLight);
+
+      // 2. High-Powered Sun / Twilight Directional Concert Wash
+      const sunLight = new THREE.DirectionalLight(0xfff6e5, 1.4);
+      sunLight.position.set(30, 60, 40);
+      sunLight.castShadow = true;
+      sunLight.shadow.mapSize.width = 2048;
+      sunLight.shadow.mapSize.height = 2048;
+      sunLight.shadow.camera.near = 10;
+      sunLight.shadow.camera.far = 160;
+      sunLight.shadow.camera.left = -60;
+      sunLight.shadow.camera.right = 60;
+      sunLight.shadow.camera.top = 60;
+      sunLight.shadow.camera.bottom = -60;
+      scene.add(sunLight);
+
+      // 3. Tall Festival Stadium Floodlight Towers (illuminating the green lawn)
+      const towerPositions = [
+        { x: -50, z: -10, targetX: -20, targetZ: 15 },
+        { x: 50, z: -10, targetX: 20, targetZ: 15 },
+        { x: -45, z: 50, targetX: -10, targetZ: 25 },
+        { x: 45, z: 50, targetX: 10, targetZ: 25 }
+      ];
+
+      towerPositions.forEach((pos) => {
+        const towerGroup = new THREE.Group();
+        towerGroup.position.set(pos.x, 0, pos.z);
+
+        // Steel Lattice Mast
+        const mastGeo = new THREE.CylinderGeometry(0.35, 0.6, 22, 6);
+        const mastMat = new THREE.MeshStandardMaterial({ color: 0x30333d, metalness: 0.9, roughness: 0.3 });
+        const mast = new THREE.Mesh(mastGeo, mastMat);
+        mast.position.y = 11;
+        towerGroup.add(mast);
+
+        // Crossbar Floodlight Bank
+        const headGeo = new THREE.BoxGeometry(4.0, 1.2, 0.8);
+        const headMat = new THREE.MeshStandardMaterial({ color: 0x1f222b, roughness: 0.5 });
+        const head = new THREE.Mesh(headGeo, headMat);
+        head.position.y = 22;
+        towerGroup.add(head);
+
+        // Glowing Lamp Fixtures
+        for (let fi = 0; fi < 4; fi++) {
+          const lampGeo = new THREE.BoxGeometry(0.7, 0.7, 0.2);
+          const lampMat = new THREE.MeshBasicMaterial({ color: 0xfff4d6 });
+          const lamp = new THREE.Mesh(lampGeo, lampMat);
+          lamp.position.set((fi - 1.5) * 0.9, 22, 0.42);
+          towerGroup.add(lamp);
+        }
+
+        // Floodlight Spot
+        const flood = new THREE.SpotLight(0xfff3d6, 1.8, 85, Math.PI / 4, 0.5, 1.0);
+        flood.position.set(pos.x, 22, pos.z);
+        const floodTarget = new THREE.Object3D();
+        floodTarget.position.set(pos.targetX, 0, pos.targetZ);
+        scene.add(floodTarget);
+        flood.target = floodTarget;
+        scene.add(flood);
+
+        scene.add(towerGroup);
+      });
     }
 
     // Moving Head Concert Spotlights with Volumetric Cones
