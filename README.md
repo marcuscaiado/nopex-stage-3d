@@ -59,15 +59,18 @@ Because this project relies on ES Modules and WebGL/Three.js assets, running dir
 
 ### Option 1: Node.js (Recommended)
 
-```bash
-npx serve . -l 8088
-Option 2: Python
+    npx serve . -l 8088
+
+### Option 2: Python
+
 For macOS / Linux:
 
-Bash
-python3 -m http.server 8088
+    python3 -m http.server 8088
+
 For Windows:
 
-Bash
-python -m http.server 8088
-After starting the server, open: http://localhost:8088
+    python -m http.server 8088
+
+---
+
+After starting the server, open: **http://localhost:8088**
