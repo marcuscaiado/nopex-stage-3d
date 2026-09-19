@@ -53,14 +53,26 @@ A zero-cost, high-density 3D live hip-hop festival and concert environment runni
 
 ---
 
+Markdown
 ## 🚀 Running Locally
 
+Because this project relies on ES Modules and WebGL/Three.js assets, opening `index.html` directly via the file system (`file://`) will fail due to browser CORS policies. You must run it through a local HTTP server.
+
+### Option 1: Node.js (Recommended)
+
+Run directly using `npx` (requires Node.js installed):
+
 ```bash
-# Using Node
-npx serve . -p 8088
+npx serve . -l 8088
+Option 2: Python
+If you have Python installed, launch the built-in HTTP server:
 
-# Or Python
+Bash
+# macOS / Linux
+python3 -m http.server 8088
+
+# Windows
 python -m http.server 8088
-```
+After starting the server, open your browser and navigate to:
 
-Open `http://localhost:8088` in your browser.
+👉 http://localhost:8088
